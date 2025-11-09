@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Legyen Ön is Milliomos - Pont visszavonás és animáció</title>
+  <style>
+    :root{--bg:#071428;--card:#0f2b45;--accent:#ffd54a;--good:#51cf66;--bad:#ff6b6b}
+    *{box-sizing:border-box;font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial}
+    body{margin:0;min-height:100vh;background:radial-gradient(circle at 10% 10%, #082338 0%, var(--bg) 40%);color:#e6f0f6;display:flex;align-items:center;justify-content:center;padding:24px}
+    .container{width:100%;max-width:820px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:28px;box-shadow:0 8px 30px rgba(3,10,20,0.6);border:1px solid rgba(255,255,255,0.04)}
+    header{display:flex;align-items:center;gap:12px}
+    .logo{width:72px;height:72px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#ffb84d);display:flex;align-items:center;justify-content:center;color:#082338;font-weight:800;font-size:20px}
+    h1{margin:0;font-size:20px}
+    .card{margin-top:18px;background:var(--card);padding:22px;border-radius:10px}
+    .question{font-size:20px;margin-bottom:18px}
+    .answers{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .ans-btn{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06));border:1px solid rgba(255,255,255,0.03);padding:14px;border-radius:8px;cursor:pointer;display:flex;gap:12px;align-items:center;font-weight:600;transition:transform .12s ease,box-shadow .12s ease;position:relative;overflow:hidden}
+    .ans-btn:active{transform:translateY(1px)}
+    .ans-btn.disabled{opacity:0.6;pointer-events:none}
+    .letter{width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,0.06);display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+    .feedback{margin-top:14px;min-height:26px}
+    .correct{background:linear-gradient(90deg, rgba(81,207,102,0.14), rgba(81,207,102,0.06));border:1px solid rgba(81,207,102,0.18)}
+    .wrong{background:linear-gradient(90deg, rgba(255,107,107,0.12), rgba(255,107,107,0.04));border:1px solid rgba(255,107,107,0.14)}
+    .controls{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
+    button.control{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:10px 12px;border-radius:8px;color:#cfe9ff;cursor:pointer;transition:background 0.2s ease, transform 0.1s ease}
+    button.control:hover{background:rgba(255,255,255,0.06)}
+    button.control:active{transform:scale(0.96)}
+    .meta{font-size:13px;opacity:0.8}
+    #score{font-weight:bold;color:var(--accent)}
+    .points-indicator{position:absolute;top:6px;right:10px;font-size:12px;color:var(--accent);opacity:0.9;transition:transform 0.2s ease, opacity 0.3s ease}
+    .flash{animation:flash 0.4s ease}
+    @keyframes flash{0%{background-color:rgba(255,213,74,0.2)}100%{background-color:transparent}}
+  </style>
+</head>
+<body>
+  <div class="container" role="application" aria-labelledby="title">
+    <header>
+      <div class="logo">MO</div>
+      <div>
+        <h1 id="title">Legyen Ön is Milliomos - Visszavonás és animáció</h1>
+        <div class="meta">Kattints a válaszra, hogy pontot tegyél rá (összesen 10). A „Visszavonás” gombbal egy korábbi pontot vonhatsz vissza. A „Megnézem” gombbal derül ki, jó-e!</div>
+      </div>
+    </header>
+
+    <div class="card" id="game">
+      <div class="question" id="question">Betöltés...</div>
+      <div class="answers" id="answers"></div>
+      <div class="feedback" id="feedback" aria-live="polite"></div>
+      <div class="controls">
+        <span>Összpont: <span id="score">0</span> / 10</span>
+        <button class="control" id="undoBtn">Visszavonás</button>
+        <button class="control" id="checkBtn">Megnézem</button>
+        <button class="control" id="nextBtn">Következő kérdés</button>
+        <button class="control" id="resetBtn">Újra</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      { q: 'Melyik évben írták alá a magyar alkotmány jelenlegi változatát?', options: ['2011', '1990', '2004', '2010'], correctIndex: 0 },
+      { q: 'Mi Magyarország fővárosa?', options: ['Debrecen','Szeged','Pécs','Budapest'], correctIndex: 3 },
+      { q: 'Hány színe van a magyar zászlónak?', options: ['2','3','4','5'], correctIndex: 1 }
+    ];
+
+    let current = 0;
+    let totalScore = 0;
+    let totalPointsPlaced = 0;
+    let currentBets = [0,0,0,0];
+    let betHistory = [];
+
+    const questionEl = document.getElementById('question');
+    const answersEl = document.getElementById('answers');
+    const feedbackEl = document.getElementById('feedback');
+    const nextBtn = document.getElementById('nextBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const checkBtn = document.getElementById('checkBtn');
+    const undoBtn = document.getElementById('undoBtn');
+    const scoreEl = document.getElementById('score');
+
+    function renderQuestion() {
+      const item = questions[current];
+      questionEl.textContent = item.q;
+      answersEl.innerHTML = '';
+      feedbackEl.textContent = '';
+      currentBets = [0,0,0,0];
+      betHistory = [];
+
+      item.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'ans-btn';
+        btn.setAttribute('data-index', i);
+        btn.innerHTML = `<span class="letter">${String.fromCharCode(65+i)}</span><span class="text">${opt}</span><span class="points-indicator" id="points-${i}">0</span>`;
+        btn.addEventListener('click', () => addPoint(i));
+        answersEl.appendChild(btn);
+      });
+    }
+
+    function addPoint(i) {
+      if (totalPointsPlaced >= 10) {
+        feedbackEl.textContent = '❌ Már elhelyezted a 10 pontot!';
+        return;
+      }
+      currentBets[i]++;
+      totalPointsPlaced++;
+      betHistory.push(i);
+      animateFlash(i);
+      updatePointsDisplay(i);
+      feedbackEl.textContent = `➕ Hozzáadtál 1 pontot (${totalPointsPlaced}/10 felhasználva)`;
+    }
+
+    function undoLastPoint() {
+      if (betHistory.length === 0) {
+        feedbackEl.textContent = '⚠️ Nincs több visszavonható pont.';
+        return;
+      }
+      const last = betHistory.pop();
+      currentBets[last]--;
+      totalPointsPlaced--;
+      animateFlash(last);
+      updatePointsDisplay(last);
+      feedbackEl.textContent = `↩️ Visszavontál 1 pontot (${totalPointsPlaced}/10 felhasználva)`;
+    }
+
+    function updatePointsDisplay(i) {
+      document.getElementById(`points-${i}`).textContent = currentBets[i];
+    }
+
+    function animateFlash(i) {
+      const btn = document.querySelectorAll('.ans-btn')[i];
+      btn.classList.remove('flash');
+      void btn.offsetWidth; // restart animation
+      btn.classList.add('flash');
+    }
+
+    function checkAnswer() {
+      const item = questions[current];
+      document.querySelectorAll('.ans-btn').forEach(b => b.classList.add('disabled'));
+      const correct = item.correctIndex;
+      const correctBtn = document.querySelectorAll('.ans-btn')[correct];
+      correctBtn.classList.add('correct');
+
+      let gained = 0;
+      let lost = 0;
+
+      currentBets.forEach((bet, i) => {
+        if (bet > 0) {
+          if (i === correct) {
+            gained += bet;
+          } else {
+            lost += bet;
+            document.querySelectorAll('.ans-btn')[i].classList.add('wrong');
+          }
+        }
+      });
+
+      totalScore += (gained - lost);
+      scoreEl.textContent = totalScore;
+      feedbackEl.textContent = `✅ +${gained} pont, ❌ -${lost} pont (Összesen: ${totalScore})`;
+    }
+
+    nextBtn.addEventListener('click', () => {
+      current = (current + 1) % questions.length;
+      totalPointsPlaced = 0;
+      renderQuestion();
+    });
+
+    resetBtn.addEventListener('click', () => {
+      current = 0;
+      totalScore = 0;
+      totalPointsPlaced = 0;
+      scoreEl.textContent = 0;
+      renderQuestion();
+    });
+
+    checkBtn.addEventListener('click', checkAnswer);
+    undoBtn.addEventListener('click', undoLastPoint);
+
+    renderQuestion();
+  </script>
+</body>
+</html>
