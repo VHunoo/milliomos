@@ -57,127 +57,182 @@
     </div>
   </div>
 
-  <script>
-    const questions = [
-      { q: 'Melyik évben írták alá a magyar alkotmány jelenlegi változatát?', options: ['2011', '1990', '2004', '2010'], correctIndex: 0 },
-      { q: 'Mi Magyarország fővárosa?', options: ['Debrecen','Szeged','Pécs','Budapest'], correctIndex: 3 },
-      { q: 'Hány színe van a magyar zászlónak?', options: ['2','3','4','5'], correctIndex: 1 }
-    ];
-
-    let current = 0;
-    let totalScore = 0;
-    let totalPointsPlaced = 0;
-    let currentBets = [0,0,0,0];
-    let betHistory = [];
-
-    const questionEl = document.getElementById('question');
-    const answersEl = document.getElementById('answers');
-    const feedbackEl = document.getElementById('feedback');
-    const nextBtn = document.getElementById('nextBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const checkBtn = document.getElementById('checkBtn');
-    const undoBtn = document.getElementById('undoBtn');
-    const scoreEl = document.getElementById('score');
-
-    function renderQuestion() {
-      const item = questions[current];
-      questionEl.textContent = item.q;
-      answersEl.innerHTML = '';
-      feedbackEl.textContent = '';
-      currentBets = [0,0,0,0];
-      betHistory = [];
-
-      item.options.forEach((opt, i) => {
-        const btn = document.createElement('button');
-        btn.className = 'ans-btn';
-        btn.setAttribute('data-index', i);
-        btn.innerHTML = `<span class="letter">${String.fromCharCode(65+i)}</span><span class="text">${opt}</span><span class="points-indicator" id="points-${i}">0</span>`;
-        btn.addEventListener('click', () => addPoint(i));
-        answersEl.appendChild(btn);
-      });
+ <script>
+  // 🔹 Kérdés sablonok – ide könnyedén írhatsz újakat
+  const questionsTemplates = [
+    {
+      q: 'Melyik évben írták alá a magyar alkotmány jelenlegi változatát?',
+      options: ['2011', '1990', '2004', '2010'],
+      correctIndex: 0
+    },
+    {
+      q: 'Mi Magyarország fővárosa?',
+      options: ['Debrecen','Szeged','Pécs','Budapest'],
+      correctIndex: 3
+    },
+    {
+      q: 'Hány színe van a magyar zászlónak?',
+      options: ['2','3','4','5'],
+      correctIndex: 1
+    },
+    {
+      q: 'Melyik bolygó a Naprendszer legnagyobbika?',
+      options: ['Mars','Jupiter','Szaturnusz','Föld'],
+      correctIndex: 1
+    },
+    {
+      q: 'Ki írta a "Toldi" című művet?',
+      options: ['Petőfi Sándor','Jókai Mór','Arany János','Móricz Zsigmond'],
+      correctIndex: 2
+    },
+    {
+      q: 'Mi a víz kémiai jele?',
+      options: ['H2O','CO2','NaCl','O2'],
+      correctIndex: 0
+    },
+    {
+      q: 'Melyik országban található a Pisa-i ferde torony?',
+      options: ['Spanyolország','Franciaország','Olaszország','Görögország'],
+      correctIndex: 2
+    },
+    {
+      q: 'Melyik évben csatlakozott Magyarország az Európai Unióhoz?',
+      options: ['2000','2002','2004','2006'],
+      correctIndex: 2
+    },
+    {
+      q: 'Hány lába van egy póknak?',
+      options: ['6','8','10','12'],
+      correctIndex: 1
+    },
+    {
+      q: 'Mi a Föld legnagyobb óceánja?',
+      options: ['Atlanti-óceán','Csendes-óceán','Indiai-óceán','Jeges-tenger'],
+      correctIndex: 1
     }
+  ];
 
-    function addPoint(i) {
-      if (totalPointsPlaced >= 10) {
-        feedbackEl.textContent = '❌ Már elhelyezted a 10 pontot!';
-        return;
-      }
-      currentBets[i]++;
-      totalPointsPlaced++;
-      betHistory.push(i);
-      animateFlash(i);
-      updatePointsDisplay(i);
-      feedbackEl.textContent = `➕ Hozzáadtál 1 pontot (${totalPointsPlaced}/10 felhasználva)`;
+  // 🔹 A játékban használt kérdések – akár véletlenszerűen is kiválaszthatóak
+  let questions = [...questionsTemplates];
+
+  // (Ha szeretnéd véletlenszerűsíteni a sorrendet, ezt kapcsold be)
+  // questions = questions.sort(() => Math.random() - 0.5);
+
+  let current = 0;
+  let totalScore = 0;
+  let totalPointsPlaced = 0;
+  let currentBets = [0,0,0,0];
+  let betHistory = [];
+
+  const questionEl = document.getElementById('question');
+  const answersEl = document.getElementById('answers');
+  const feedbackEl = document.getElementById('feedback');
+  const nextBtn = document.getElementById('nextBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const checkBtn = document.getElementById('checkBtn');
+  const undoBtn = document.getElementById('undoBtn');
+  const scoreEl = document.getElementById('score');
+
+  function renderQuestion() {
+    const item = questions[current];
+    questionEl.textContent = item.q;
+    answersEl.innerHTML = '';
+    feedbackEl.textContent = '';
+    currentBets = [0,0,0,0];
+    betHistory = [];
+
+    item.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'ans-btn';
+      btn.setAttribute('data-index', i);
+      btn.innerHTML = `<span class="letter">${String.fromCharCode(65+i)}</span><span class="text">${opt}</span><span class="points-indicator" id="points-${i}">0</span>`;
+      btn.addEventListener('click', () => addPoint(i));
+      answersEl.appendChild(btn);
+    });
+  }
+
+  function addPoint(i) {
+    if (totalPointsPlaced >= 10) {
+      feedbackEl.textContent = '❌ Már elhelyezted a 10 pontot!';
+      return;
     }
+    currentBets[i]++;
+    totalPointsPlaced++;
+    betHistory.push(i);
+    animateFlash(i);
+    updatePointsDisplay(i);
+    feedbackEl.textContent = `➕ Hozzáadtál 1 pontot (${totalPointsPlaced}/10 felhasználva)`;
+  }
 
-    function undoLastPoint() {
-      if (betHistory.length === 0) {
-        feedbackEl.textContent = '⚠️ Nincs több visszavonható pont.';
-        return;
-      }
-      const last = betHistory.pop();
-      currentBets[last]--;
-      totalPointsPlaced--;
-      animateFlash(last);
-      updatePointsDisplay(last);
-      feedbackEl.textContent = `↩️ Visszavontál 1 pontot (${totalPointsPlaced}/10 felhasználva)`;
+  function undoLastPoint() {
+    if (betHistory.length === 0) {
+      feedbackEl.textContent = '⚠️ Nincs több visszavonható pont.';
+      return;
     }
+    const last = betHistory.pop();
+    currentBets[last]--;
+    totalPointsPlaced--;
+    animateFlash(last);
+    updatePointsDisplay(last);
+    feedbackEl.textContent = `↩️ Visszavontál 1 pontot (${totalPointsPlaced}/10 felhasználva)`;
+  }
 
-    function updatePointsDisplay(i) {
-      document.getElementById(`points-${i}`).textContent = currentBets[i];
-    }
+  function updatePointsDisplay(i) {
+    document.getElementById(`points-${i}`).textContent = currentBets[i];
+  }
 
-    function animateFlash(i) {
-      const btn = document.querySelectorAll('.ans-btn')[i];
-      btn.classList.remove('flash');
-      void btn.offsetWidth; // restart animation
-      btn.classList.add('flash');
-    }
+  function animateFlash(i) {
+    const btn = document.querySelectorAll('.ans-btn')[i];
+    btn.classList.remove('flash');
+    void btn.offsetWidth; // restart animation
+    btn.classList.add('flash');
+  }
 
-    function checkAnswer() {
-      const item = questions[current];
-      document.querySelectorAll('.ans-btn').forEach(b => b.classList.add('disabled'));
-      const correct = item.correctIndex;
-      const correctBtn = document.querySelectorAll('.ans-btn')[correct];
-      correctBtn.classList.add('correct');
+  function checkAnswer() {
+    const item = questions[current];
+    document.querySelectorAll('.ans-btn').forEach(b => b.classList.add('disabled'));
+    const correct = item.correctIndex;
+    const correctBtn = document.querySelectorAll('.ans-btn')[correct];
+    correctBtn.classList.add('correct');
 
-      let gained = 0;
-      let lost = 0;
+    let gained = 0;
+    let lost = 0;
 
-      currentBets.forEach((bet, i) => {
-        if (bet > 0) {
-          if (i === correct) {
-            gained += bet;
-          } else {
-            lost += bet;
-            document.querySelectorAll('.ans-btn')[i].classList.add('wrong');
-          }
+    currentBets.forEach((bet, i) => {
+      if (bet > 0) {
+        if (i === correct) {
+          gained += bet;
+        } else {
+          lost += bet;
+          document.querySelectorAll('.ans-btn')[i].classList.add('wrong');
         }
-      });
-
-      totalScore += (gained - lost);
-      scoreEl.textContent = totalScore;
-      feedbackEl.textContent = `✅ +${gained} pont, ❌ -${lost} pont (Összesen: ${totalScore})`;
-    }
-
-    nextBtn.addEventListener('click', () => {
-      current = (current + 1) % questions.length;
-      totalPointsPlaced = 0;
-      renderQuestion();
+      }
     });
 
-    resetBtn.addEventListener('click', () => {
-      current = 0;
-      totalScore = 0;
-      totalPointsPlaced = 0;
-      scoreEl.textContent = 0;
-      renderQuestion();
-    });
+    totalScore += (gained - lost);
+    scoreEl.textContent = totalScore;
+    feedbackEl.textContent = `✅ +${gained} pont, ❌ -${lost} pont (Összesen: ${totalScore})`;
+  }
 
-    checkBtn.addEventListener('click', checkAnswer);
-    undoBtn.addEventListener('click', undoLastPoint);
-
+  nextBtn.addEventListener('click', () => {
+    current = (current + 1) % questions.length;
+    totalPointsPlaced = 0;
     renderQuestion();
-  </script>
+  });
+
+  resetBtn.addEventListener('click', () => {
+    current = 0;
+    totalScore = 0;
+    totalPointsPlaced = 0;
+    scoreEl.textContent = 0;
+    renderQuestion();
+  });
+
+  checkBtn.addEventListener('click', checkAnswer);
+  undoBtn.addEventListener('click', undoLastPoint);
+
+  renderQuestion();
+</script>
 </body>
 </html>
+
