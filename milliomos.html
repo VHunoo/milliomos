@@ -43,7 +43,7 @@
       </div>
     </header>
     <div class="card" id="game">
-      <div class="question" id="question">Betöltés...</div>
+      <div class="question" id="question"></div>
       <div class="answers" id="answers"></div>
       <div class="feedback" id="feedback" aria-live="polite"></div>
       <div class="controls">
@@ -166,7 +166,7 @@ function checkAnswer() {
   scoreEl.textContent = finalScore;
 
   if (availablePoints <= 0) {
-    setTimeout(endGame, 400); // kicsi késleltetés, hogy látszódjon a feedback
+    setTimeout(endGame, 400);
   } else {
     feedbackEl.textContent = `✅ +${gained} pont → Következő kérdésre marad: ${availablePoints}`;
   }
@@ -213,10 +213,12 @@ function endGame() {
   gameEl.classList.add('game-over');
   document.getElementById('restartBtn').addEventListener('click', resetGame);
 }
-
+renderQuestion();
   </script>
 </body>
 </html>
+
+
 
 
 
