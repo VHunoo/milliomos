@@ -57,10 +57,150 @@
   </div>
 
   <script>
+const START_POINTS = 10;
+
+const questions = [
+  { q: 'Melyik évben írták alá a magyar alkotmány jelenlegi változatát?', options: ['2011', '1990', '2004', '2010'], correctIndex: 0 },
+  { q: 'Mi Magyarország fővárosa?', options: ['Debrecen','Szeged','Pécs','Budapest'], correctIndex: 3 },
+  { q: 'Hány színe van a magyar zászlónak?', options: ['2','3','4','5'], correctIndex: 1 },
+  { q: 'Ki írta a Toldi című művet?', options: ['Petőfi Sándor','Jókai Mór','Arany János','Móricz Zsigmond'], correctIndex: 2 },
+  { q: 'Melyik bolygó a Naprendszer legnagyobbika?', options: ['Mars','Föld','Jupiter','Szaturnusz'], correctIndex: 2 }
+];
+
+let current = 0;
+let finalScore = 0;
+let availablePoints = START_POINTS;
+let totalPointsPlaced = 0;
+let currentBets = [0,0,0,0];
+let betHistory = [];
+let gameOver = false;
+
+const questionEl = document.getElementById('question');
+const answersEl = document.getElementById('answers');
+const feedbackEl = document.getElementById('feedback');
+const nextBtn = document.getElementById('nextBtn');
+const resetBtn = document.getElementById('resetBtn');
+const checkBtn = document.getElementById('checkBtn');
+const undoBtn = document.getElementById('undoBtn');
+const scoreEl = document.getElementById('score');
+const gameEl = document.getElementById('game');
+
+function renderQuestion() {
+  if (gameOver) return;
+
+  const item = questions[current];
+  questionEl.textContent = item.q;
+  answersEl.innerHTML = '';
+  feedbackEl.textContent = '';
+  currentBets = [0,0,0,0];
+  betHistory = [];
+  totalPointsPlaced = 0;
+
+  item.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'ans-btn';
+    btn.setAttribute('data-index', i);
+    btn.innerHTML = `<span class="letter">${String.fromCharCode(65+i)}</span><span class="text">${opt}</span><span class="points-indicator" id="points-${i}">0</span>`;
+    btn.addEventListener('click', () => addPoint(i));
+    answersEl.appendChild(btn);
+  });
+
+  feedbackEl.textContent = `🎯 Elérhető pontok: ${availablePoints}`;
+}
+
+function addPoint(i) {
+  if (totalPointsPlaced >= availablePoints) {
+    feedbackEl.textContent = `❌ Már elhelyezted az összes (${availablePoints}) pontot!`;
+    return;
+  }
+  currentBets[i]++;
+  totalPointsPlaced++;
+  betHistory.push(i);
+  animateFlash(i);
+  updatePointsDisplay(i);
+  feedbackEl.textContent = `➕ Hozzáadtál 1 pontot (${totalPointsPlaced}/${availablePoints} felhasználva)`;
+}
+
+function undoLastPoint() {
+  if (betHistory.length === 0) {
+    feedbackEl.textContent = '⚠️ Nincs több visszavonható pont.';
+    return;
+  }
+  const last = betHistory.pop();
+  currentBets[last]--;
+  totalPointsPlaced--;
+  animateFlash(last);
+  updatePointsDisplay(last);
+  feedbackEl.textContent = `↩️ Visszavontál 1 pontot (${totalPointsPlaced}/${availablePoints} felhasználva)`;
+}
+
+function updatePointsDisplay(i) {
+  document.getElementById(`points-${i}`).textContent = currentBets[i];
+}
+
+function animateFlash(i) {
+  const btn = document.querySelectorAll('.ans-btn')[i];
+  btn.classList.remove('flash');
+  void btn.offsetWidth;
+  btn.classList.add('flash');
+}
+
+function checkAnswer() {
+  if (gameOver) return;
+
+  const item = questions[current];
+  document.querySelectorAll('.ans-btn').forEach(b => b.classList.add('disabled'));
+  const correct = item.correctIndex;
+  document.querySelectorAll('.ans-btn')[correct].classList.add('correct');
+
+  let gained = currentBets[correct];
+  finalScore += gained;
+  availablePoints = gained;
+
+  currentBets.forEach((bet, i) => {
+    if (bet > 0 && i !== correct) {
+      document.querySelectorAll('.ans-btn')[i].classList.add('wrong');
+    }
+  });
+
+  scoreEl.textContent = finalScore;
+
+  if (availablePoints <= 0) {
+    setTimeout(endGame, 400);
+  } else {
+    feedbackEl.textContent = `✅ +${gained} pont → Következő kérdésre marad: ${availablePoints}`;
+  }
+}
+
+nextBtn.addEventListener('click', () => {
+  if (gameOver) return;
+  if (availablePoints <= 0) return;
+  current++;
+  if (current >= questions.length) {
+    endGame();
+    return;
+  }
+  renderQuestion();
+});
+
+resetBtn.addEventListener('click', resetGame);
+checkBtn.addEventListener('click', checkAnswer);
+undoBtn.addEventListener('click', undoLastPoint);
+
+function resetGame() {
+  current = 0;
+  finalScore = 0;
+  availablePoints = START_POINTS;
+  scoreEl.textContent = 0;
+  gameOver = false;
+  gameEl.classList.remove('game-over');
+  document.querySelector('.game-over-overlay')?.remove();
+  renderQuestion();
+}
+
 function endGame() {
   gameOver = true;
 
-  // Overlay létrehozása
   const overlay = document.createElement('div');
   overlay.className = 'game-over-overlay';
   overlay.style.position = 'fixed';
@@ -76,7 +216,6 @@ function endGame() {
   overlay.style.opacity = 0;
   overlay.style.transition = 'opacity 0.5s ease';
 
-  // Belső doboz
   const box = document.createElement('div');
   box.style.background = '#0f2b45';
   box.style.border = '2px solid #ffd54a';
@@ -87,7 +226,6 @@ function endGame() {
   box.style.transform = 'scale(0.8)';
   box.style.transition = 'transform 0.5s ease';
 
-  // Szöveg
   const title = document.createElement('h2');
   title.textContent = '🎮 Játék vége!';
   title.style.marginBottom = '16px';
@@ -114,7 +252,6 @@ function endGame() {
   overlay.appendChild(box);
   document.body.appendChild(overlay);
 
-  // Animáció indítása
   requestAnimationFrame(() => {
     overlay.style.opacity = 1;
     box.style.transform = 'scale(1)';
@@ -123,9 +260,12 @@ function endGame() {
   gameEl.classList.add('game-over');
 }
 
+renderQuestion();
+
   </script>
 </body>
 </html>
+
 
 
 
