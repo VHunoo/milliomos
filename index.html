@@ -7,7 +7,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg-gradient: linear-gradient(135deg, #0f2b45, #071428);
     --btn-gradient1: linear-gradient(135deg, #ffd54a, #ffb84d);
     --btn-gradient2: linear-gradient(135deg, #6bc1ff, #4a90e2);
     --btn-gradient3: linear-gradient(135deg, #ff6b6b, #ff3d3d);
@@ -16,33 +15,41 @@
     --text-color: #fff;
   }
 
-  * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+  * { box-sizing: border-box; font-family: 'Inter', sans-serif; margin:0; padding:0; }
+
   body {
-    margin: 0;
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    background: var(--bg-gradient);
+    background: radial-gradient(circle at 20% 30%, #0f2b45, #071428 80%);
     overflow: hidden;
     position: relative;
   }
 
-  /* Animált háttér */
-  body::before {
-    content: '';
+  /* Dinamikus csillagok/particle hatás */
+  .stars {
     position: absolute;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
-    background-size: 50px 50px;
-    animation: moveStars 60s linear infinite;
+    width: 100%;
+    height: 100%;
+    background: transparent;
     z-index: 0;
+    overflow: hidden;
   }
 
-  @keyframes moveStars {
-    0% { transform: translate(0,0); }
-    100% { transform: translate(-50px, -50px); }
+  .star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: moveStar linear infinite;
+  }
+
+  @keyframes moveStar {
+    from { transform: translateY(0) translateX(0); }
+    to { transform: translateY(-1000px) translateX(100px); }
   }
 
   .menu-container {
@@ -52,7 +59,7 @@
     padding: 60px 50px;
     background: rgba(15,43,69,0.85);
     border-radius: 25px;
-    box-shadow: 0 15px 40px var(--btn-shadow);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.5);
     border: 1px solid rgba(255,255,255,0.1);
     animation: fadeIn 1s ease forwards;
   }
@@ -66,7 +73,7 @@
     font-size: 40px;
     margin-bottom: 60px;
     color: var(--text-color);
-    text-shadow: 0 0 10px rgba(255,255,255,0.3);
+    text-shadow: 0 0 15px rgba(255,255,255,0.3);
   }
 
   .menu-btn {
@@ -81,7 +88,7 @@
     border-radius: 15px;
     cursor: pointer;
     text-decoration: none;
-    box-shadow: 0 8px 20px var(--btn-shadow);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
@@ -105,7 +112,12 @@
 
   .menu-btn:hover {
     transform: translateY(-5px) scale(1.05);
-    box-shadow: 0 12px 30px var(--btn-shadow);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+  }
+
+  .menu-btn:active {
+    transform: translateY(0) scale(0.98);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
   }
 
   .btn1 { background: var(--btn-gradient1); }
@@ -120,6 +132,10 @@
 </style>
 </head>
 <body>
+
+<!-- Csillagok generálása -->
+<div class="stars"></div>
+
 <div class="menu-container">
   <h1>Válassz játékost</h1>
   <a href="balazs.html" class="menu-btn btn1">Balázs</a>
@@ -127,5 +143,21 @@
   <a href="dani.html" class="menu-btn btn3">Dani</a>
   <a href="istvan.html" class="menu-btn btn4">István</a>
 </div>
+
+<script>
+  // Generáljunk 100 csillagot a háttérhez
+  const starsContainer = document.querySelector('.stars');
+  for (let i = 0; i < 100; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.top = Math.random() * window.innerHeight + 'px';
+    star.style.left = Math.random() * window.innerWidth + 'px';
+    star.style.width = (Math.random() * 2 + 1) + 'px';
+    star.style.height = (Math.random() * 2 + 1) + 'px';
+    star.style.animationDuration = (Math.random() * 30 + 20) + 's';
+    starsContainer.appendChild(star);
+  }
+</script>
+
 </body>
 </html>
