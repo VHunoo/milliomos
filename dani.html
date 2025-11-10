@@ -132,21 +132,21 @@ button.control:active { transform: scale(0.95); }
 .game-over-box button { padding:12px 24px; border:none; border-radius:8px; background:var(--accent); color:#071428; font-weight:bold; cursor:pointer; transition: transform 0.2s ease; }
 .game-over-box button:hover { transform: scale(1.05); }
 
-/* ===== Piros elsötétedés a végén ===== */
+
 body.game-over-flash::after {
   content: "";
   position: fixed;
   top: 0; left: 0;
   width: 100%; height: 100%;
-  background: rgba(255, 0, 0, 0.15);
+  background: rgba(255, 0, 0, 0.4);
   z-index: 9000;
   pointer-events: none;
-  animation: redFlash 1s ease forwards;
+  animation: redFlash 1.2s ease forwards;
 }
 @keyframes redFlash {
-  0% { background: rgba(255, 0, 0, 0); }
-  50% { background: rgba(255, 0, 0, 0.25); }
-  100% { background: rgba(255, 0, 0, 0.15); }
+  0% { background: rgba(255, 0, 0, 0.6); }
+  50% { background: rgba(255, 0, 0, 0.4); }
+  100% { background: rgba(255, 0, 0, 0); }
 }
 
 </style>
@@ -234,7 +234,6 @@ const gameOverOverlay=document.getElementById('gameOverOverlay');
 const finalScoreText=document.getElementById('finalScoreText');
 const restartBtn=document.getElementById('restartBtn');
 
-/* ===== Funkciók ===== */
 function renderQuestion() {
   if(gameOver) return;
   const item=questions[current];
@@ -287,7 +286,7 @@ function checkAnswer(){
 
   scoreEl.textContent=finalScore;
 
-  if(availablePoints<=0) setTimeout(endGame,400);
+  if(availablePoints<=0) setTimeout(endGame,500);
   else feedbackEl.textContent=`✅ Sikeres továbbjutás! Következő kérdésre marad: ${availablePoints} pia`;
 }
 
@@ -303,7 +302,7 @@ checkBtn.addEventListener('click', checkAnswer);
 undoBtn.addEventListener('click', undoLastPoint);
 
 function resetGame(){
-  document.body.classList.remove('game-over-flash'); // 🔴 eltávolítja a piros effektet
+  document.body.classList.remove('game-over-flash');
   current=0; finalScore=0; availablePoints=START_POINTS; gameOver=false;
   scoreEl.textContent=0; gameOverOverlay.style.display='none';
   startOverlay.style.display='flex';
@@ -311,19 +310,17 @@ function resetGame(){
 
 function endGame(){
   gameOver=true;
-  document.body.classList.add('game-over-flash'); // 🔴 piros overlay aktiválása
+  document.body.classList.add('game-over-flash');
   gameOverOverlay.style.display='flex';
   gameOverOverlay.style.opacity=1;
   finalScoreText.textContent=`10 kérdésből ${finalScore} kérdésen jutottál túl pozitív piával.`;
 }
 
-/* ===== Start overlay ===== */
 startBtn.addEventListener('click',()=>{
   startOverlay.style.display='none';
   renderQuestion();
 });
 restartBtn.addEventListener('click', resetGame);
-
 </script>
 
 </body>
