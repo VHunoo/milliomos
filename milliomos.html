@@ -153,8 +153,13 @@ function checkAnswer() {
   const correct = item.correctIndex;
   document.querySelectorAll('.ans-btn')[correct].classList.add('correct');
 
-  let gained = currentBets[correct];
+  // Csak a jó válaszra rakott pontok számítanak
+  let gained = currentBets[correct]; 
+
+  // Összpont csak a jó válaszokból
   finalScore += gained;
+
+  // Következő kérdéshez: csak a jó válaszra rakott pont marad
   availablePoints = gained;
 
   currentBets.forEach((bet, i) => {
@@ -163,6 +168,7 @@ function checkAnswer() {
     }
   });
 
+  // Csak a valós összpont
   scoreEl.textContent = finalScore;
 
   if (availablePoints <= 0) {
@@ -171,6 +177,7 @@ function checkAnswer() {
     feedbackEl.textContent = `✅ +${gained} pont → Következő kérdésre marad: ${availablePoints}`;
   }
 }
+
 
 nextBtn.addEventListener('click', () => {
   if (gameOver) return;
@@ -265,6 +272,7 @@ renderQuestion();
   </script>
 </body>
 </html>
+
 
 
 
