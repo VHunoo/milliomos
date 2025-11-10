@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="hu">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Legyen Ön is Milliomos - Pont visszavonás és animáció</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Legyen Ön is Milliomos</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -26,37 +26,22 @@ body {
   overflow: hidden;
 }
 
-/* Csillagok / particle háttér */
+/* Csillagos háttér */
 .stars {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: transparent;
-  z-index: 0;
-  overflow: hidden;
+  position: absolute; width: 100%; height: 100%; z-index: 0; overflow: hidden;
 }
-
 .star {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  background: white;
-  border-radius: 50%;
-  opacity: 0.7;
+  position: absolute; width: 2px; height: 2px; background: white; border-radius:50%; opacity:0.7;
   animation: moveStar linear infinite;
 }
-
 @keyframes moveStar {
   from { transform: translateY(0) translateX(0); }
   to { transform: translateY(-1000px) translateX(50px); }
 }
 
-/* Játék kártya */
 .container {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  max-width: 820px;
+  position: relative; z-index: 1;
+  width: 100%; max-width: 820px;
   background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
   border-radius: 20px;
   padding: 30px;
@@ -64,7 +49,6 @@ body {
   border: 1px solid rgba(255,255,255,0.04);
   animation: fadeIn 1s ease forwards;
 }
-
 @keyframes fadeIn { from {opacity:0; transform: scale(0.95);} to {opacity:1; transform: scale(1);} }
 
 header { display:flex; align-items:center; gap:15px; margin-bottom:20px; }
@@ -75,7 +59,7 @@ header { display:flex; align-items:center; gap:15px; margin-bottom:20px; }
   font-weight:800; font-size:24px; color:#071428;
   box-shadow:0 6px 20px rgba(0,0,0,0.3);
 }
-h1 { font-size:22px; margin:0; }
+h1 { font-size:22px; margin:0; color:#fff; }
 
 .card {
   background: var(--bg2);
@@ -95,7 +79,7 @@ h1 { font-size:22px; margin:0; }
   transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
   position:relative; overflow:hidden;
 }
-.ans-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
+.ans-btn:hover { transform: translateY(-2px); box-shadow:0 8px 20px rgba(0,0,0,0.5); }
 .ans-btn:active { transform: translateY(1px); }
 .ans-btn.disabled { opacity:0.6; pointer-events:none; }
 
@@ -120,30 +104,13 @@ button.control:active { transform: scale(0.95); }
 .flash { animation: flash 0.4s ease; }
 @keyframes flash { 0%{background-color:rgba(255,213,74,0.2)} 100%{background-color:transparent} }
 
-.game-over-overlay {
-  position: fixed;
-  top:0; left:0; width:100%; height:100%;
-  background: rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center;
-  z-index:9999; opacity:0; transition: opacity 0.5s ease;
-}
-.game-over-box {
-  background: var(--bg2); border:2px solid var(--accent);
-  border-radius:16px; padding:40px; text-align:center; color:#fff;
-  transform: scale(0.8); transition: transform 0.5s ease;
-}
-.game-over-box h2 { margin-bottom:16px; font-size:28px; }
-.game-over-box p { margin-bottom:20px; font-size:18px; }
-.game-over-box button {
-  padding:12px 24px; border:none; border-radius:8px; background:var(--accent); color:#071428; font-weight:bold; cursor:pointer;
-  transition: transform 0.2s ease;
-}
-.game-over-box button:hover { transform: scale(1.05); }
-
-#start-overlay {
+/* Overlay stílusok */
+#start-overlay, .game-over-overlay {
   position: fixed; top:0; left:0; width:100%; height:100%;
-  background: rgba(0,0,0,0.85); display:flex; flex-direction:column; align-items:center; justify-content:center;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
   color:#fff; z-index:9999; font-family:'Inter';
 }
+#start-overlay { background: rgba(0,0,0,0.85); }
 #start-overlay h2 { font-size:32px; margin-bottom:20px; }
 #start-overlay button {
   padding:12px 24px; font-size:18px; border:none; border-radius:8px;
@@ -151,6 +118,16 @@ button.control:active { transform: scale(0.95); }
   transition: transform 0.2s ease;
 }
 #start-overlay button:hover { transform: scale(1.05); }
+
+.game-over-overlay { background: rgba(0,0,0,0.85); display:none; opacity:0; transition:opacity 0.5s ease; justify-content:center; align-items:center; }
+.game-over-box {
+  background: var(--bg2); border:2px solid var(--accent); border-radius:16px;
+  padding:40px; text-align:center; color:#fff; transform: scale(0.8); transition: transform 0.5s ease;
+}
+.game-over-box h2 { margin-bottom:16px; font-size:28px; }
+.game-over-box p { margin-bottom:20px; font-size:18px; }
+.game-over-box button { padding:12px 24px; border:none; border-radius:8px; background:var(--accent); color:#071428; font-weight:bold; cursor:pointer; transition: transform 0.2s ease; }
+.game-over-box button:hover { transform: scale(1.05); }
 
 </style>
 </head>
@@ -180,8 +157,23 @@ button.control:active { transform: scale(0.95); }
   </div>
 </div>
 
+<!-- Indító overlay -->
+<div id="start-overlay">
+  <h2>🎯 Készen állsz?</h2>
+  <button id="startBtn">Indítás</button>
+</div>
+
+<!-- Game over overlay -->
+<div class="game-over-overlay" id="gameOverOverlay">
+  <div class="game-over-box">
+    <h2>🎮 Játék vége!</h2>
+    <p id="finalScoreText"></p>
+    <button id="restartBtn">Újraindítás</button>
+  </div>
+</div>
+
 <script>
-// ==== CSILLAGOK GENERÁLÁS ====
+/* ===== Csillagok generálása ===== */
 const starsContainer = document.querySelector('.stars');
 for(let i=0;i<100;i++){
   const star=document.createElement('div');
@@ -194,7 +186,122 @@ for(let i=0;i<100;i++){
   starsContainer.appendChild(star);
 }
 
-// ===== A játék teljes JS logikája (korábbi kódot itt be lehet illeszteni) =====
+/* ===== Játék logika ===== */
+const START_POINTS = 10;
+const questions = [
+  { q: 'Melyik évben írták alá a magyar alkotmány jelenlegi változatát?', options: ['2011', '1990', '2004', '2010'], correctIndex: 0 },
+  { q: 'Mi Magyarország fővárosa?', options: ['Debrecen','Szeged','Pécs','Budapest'], correctIndex: 3 },
+  { q: 'Hány színe van a magyar zászlónak?', options: ['2','3','4','5'], correctIndex: 1 },
+  { q: 'Ki írta a Toldi című művet?', options: ['Petőfi Sándor','Jókai Mór','Arany János','Móricz Zsigmond'], correctIndex: 2 },
+  { q: 'Melyik bolygó a Naprendszer legnagyobbika?', options: ['Mars','Föld','Jupiter','Szaturnusz'], correctIndex: 2 }
+];
+
+let current=0, finalScore=0, availablePoints=START_POINTS, totalPointsPlaced=0, currentBets=[0,0,0,0], betHistory=[], gameOver=false;
+
+const questionEl=document.getElementById('question');
+const answersEl=document.getElementById('answers');
+const feedbackEl=document.getElementById('feedback');
+const nextBtn=document.getElementById('nextBtn');
+const resetBtn=document.getElementById('resetBtn');
+const checkBtn=document.getElementById('checkBtn');
+const undoBtn=document.getElementById('undoBtn');
+const scoreEl=document.getElementById('score');
+const gameEl=document.getElementById('game');
+
+const startOverlay=document.getElementById('start-overlay');
+const startBtn=document.getElementById('startBtn');
+const gameOverOverlay=document.getElementById('gameOverOverlay');
+const finalScoreText=document.getElementById('finalScoreText');
+const restartBtn=document.getElementById('restartBtn');
+
+/* ===== Funkciók ===== */
+function renderQuestion() {
+  if(gameOver) return;
+  const item=questions[current];
+  questionEl.textContent=item.q;
+  answersEl.innerHTML='';
+  feedbackEl.textContent='';
+  currentBets=[0,0,0,0]; betHistory=[]; totalPointsPlaced=0;
+
+  item.options.forEach((opt,i)=>{
+    const btn=document.createElement('button');
+    btn.className='ans-btn';
+    btn.setAttribute('data-index',i);
+    btn.innerHTML=`<span class="letter">${String.fromCharCode(65+i)}</span><span class="text">${opt}</span><span class="points-indicator" id="points-${i}">0</span>`;
+    btn.addEventListener('click',()=>addPoint(i));
+    answersEl.appendChild(btn);
+  });
+
+  feedbackEl.textContent=`🎯 Elérhető piák: ${availablePoints}`;
+}
+
+function addPoint(i) {
+  if(totalPointsPlaced>=availablePoints){ feedbackEl.textContent=`❌ Már elhelyezted az összes (${availablePoints}) piát!`; return; }
+  currentBets[i]++; totalPointsPlaced++; betHistory.push(i);
+  updatePointsDisplay(i); feedbackEl.textContent=`➕ Hozzáadtál 1 piát (${totalPointsPlaced}/${availablePoints} felhasználva)`;
+}
+
+function undoLastPoint() {
+  if(betHistory.length===0){ feedbackEl.textContent='⚠️ Nincs több visszavonható pia.'; return; }
+  const last=betHistory.pop(); currentBets[last]--; totalPointsPlaced--;
+  updatePointsDisplay(last);
+  feedbackEl.textContent=`↩️ Visszavontál 1 piát (${totalPointsPlaced}/${availablePoints} felhasználva)`;
+}
+
+function updatePointsDisplay(i){ document.getElementById(`points-${i}`).textContent=currentBets[i]; }
+
+function checkAnswer(){
+  if(gameOver) return;
+  const item=questions[current];
+  document.querySelectorAll('.ans-btn').forEach(b=>b.classList.add('disabled'));
+  const correct=item.correctIndex;
+  document.querySelectorAll('.ans-btn')[correct].classList.add('correct');
+
+  let gainedPoints=currentBets[correct];
+  if(gainedPoints>0) finalScore+=1;
+  availablePoints=gainedPoints;
+
+  currentBets.forEach((bet,i)=>{
+    if(bet>0 && i!==correct) document.querySelectorAll('.ans-btn')[i].classList.add('wrong');
+  });
+
+  scoreEl.textContent=finalScore;
+
+  if(availablePoints<=0) setTimeout(endGame,400);
+  else feedbackEl.textContent=`✅ Sikeres továbbjutás! Következő kérdésre marad: ${availablePoints} pia`;
+}
+
+nextBtn.addEventListener('click',()=>{
+  if(gameOver||availablePoints<=0) return;
+  current++;
+  if(current>=questions.length){ endGame(); return; }
+  renderQuestion();
+});
+
+resetBtn.addEventListener('click', resetGame);
+checkBtn.addEventListener('click', checkAnswer);
+undoBtn.addEventListener('click', undoLastPoint);
+
+function resetGame(){
+  current=0; finalScore=0; availablePoints=START_POINTS; gameOver=false;
+  scoreEl.textContent=0; gameOverOverlay.style.display='none';
+  startOverlay.style.display='flex';
+}
+
+function endGame(){
+  gameOver=true;
+  gameOverOverlay.style.display='flex';
+  gameOverOverlay.style.opacity=1;
+  finalScoreText.textContent=`10 kérdésből ${finalScore} kérdésen jutottál túl pozitív piával.`;
+}
+
+/* ===== Start overlay ===== */
+startBtn.addEventListener('click',()=>{
+  startOverlay.style.display='none';
+  renderQuestion();
+});
+restartBtn.addEventListener('click', resetGame);
+
 </script>
 
 </body>
