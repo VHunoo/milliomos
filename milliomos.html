@@ -165,11 +165,12 @@
       }
     });
 
-    totalScore += (gained - lost);
-    availablePoints = gained; // 🔹 csak a jó válaszra rakott pontok maradnak meg!
+    // 🔹 Csak a helyes válaszokra rakott pontokat adjuk az összpontszámhoz!
+    totalScore += gained;
+    availablePoints = gained; // 🔹 Következő kérdésre ennyi pont marad
     scoreEl.textContent = totalScore;
 
-    feedbackEl.textContent = `✅ +${gained} pont, ❌ -${lost} pont → Következő kérdéshez elérhető: ${availablePoints}`;
+    feedbackEl.textContent = `✅ +${gained} pont | ❌ -${lost} pont elveszett → Következő körre marad: ${availablePoints}`;
   }
 
   nextBtn.addEventListener('click', () => {
@@ -185,7 +186,7 @@
   resetBtn.addEventListener('click', () => {
     current = 0;
     totalScore = 0;
-    availablePoints = START_POINTS; // 🔹 újrakezdésnél visszaáll 10-re
+    availablePoints = START_POINTS;
     scoreEl.textContent = 0;
     renderQuestion();
   });
@@ -197,8 +198,10 @@
 </script>
 
 
+
 </body>
 </html>
+
 
 
 
