@@ -86,7 +86,6 @@ h1 { font-size:22px; margin:0; color:#fff; }
   color: #ffffff;
 }
 
-
 .letter { width:36px; height:36px; border-radius:8px; background: rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; }
 .points-indicator { position:absolute; top:6px; right:10px; font-size:12px; color:var(--accent); opacity:0.9; transition:transform 0.2s ease, opacity 0.3s ease; }
 
@@ -132,6 +131,23 @@ button.control:active { transform: scale(0.95); }
 .game-over-box p { margin-bottom:20px; font-size:18px; }
 .game-over-box button { padding:12px 24px; border:none; border-radius:8px; background:var(--accent); color:#071428; font-weight:bold; cursor:pointer; transition: transform 0.2s ease; }
 .game-over-box button:hover { transform: scale(1.05); }
+
+
+body.game-over-flash::after {
+  content: "";
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(255, 0, 0, 0.4);
+  z-index: 9000;
+  pointer-events: none;
+  animation: redFlash 1.2s ease forwards;
+}
+@keyframes redFlash {
+  0% { background: rgba(255, 0, 0, 0.6); }
+  50% { background: rgba(255, 0, 0, 0.4); }
+  100% { background: rgba(255, 0, 0, 0); }
+}
 
 </style>
 </head>
@@ -218,7 +234,6 @@ const gameOverOverlay=document.getElementById('gameOverOverlay');
 const finalScoreText=document.getElementById('finalScoreText');
 const restartBtn=document.getElementById('restartBtn');
 
-/* ===== Funkciók ===== */
 function renderQuestion() {
   if(gameOver) return;
   const item=questions[current];
@@ -242,7 +257,7 @@ function renderQuestion() {
 function addPoint(i) {
   if(totalPointsPlaced>=availablePoints){ feedbackEl.textContent=`❌ Már elhelyezted az összes (${availablePoints}) piát!`; return; }
   currentBets[i]++; totalPointsPlaced++; betHistory.push(i);
-  updatePointsDisplay(i); feedbackEl.textContent=`➕ Hozzáadtál 1 piát (${totalPointsPlaced}/${availablePoints} felhasználva)`;
+  updatePointsDisplay(i); feedbackEl.textContent=`➕ Hozzáadtál 1 piát (${totalPointsPlaced}/${availablePoints} felhasználva)`; 
 }
 
 function undoLastPoint() {
@@ -271,7 +286,7 @@ function checkAnswer(){
 
   scoreEl.textContent=finalScore;
 
-  if(availablePoints<=0) setTimeout(endGame,400);
+  if(availablePoints<=0) setTimeout(endGame,500);
   else feedbackEl.textContent=`✅ Sikeres továbbjutás! Következő kérdésre marad: ${availablePoints} pia`;
 }
 
@@ -287,6 +302,7 @@ checkBtn.addEventListener('click', checkAnswer);
 undoBtn.addEventListener('click', undoLastPoint);
 
 function resetGame(){
+  document.body.classList.remove('game-over-flash');
   current=0; finalScore=0; availablePoints=START_POINTS; gameOver=false;
   scoreEl.textContent=0; gameOverOverlay.style.display='none';
   startOverlay.style.display='flex';
@@ -294,19 +310,19 @@ function resetGame(){
 
 function endGame(){
   gameOver=true;
+  document.body.classList.add('game-over-flash');
   gameOverOverlay.style.display='flex';
   gameOverOverlay.style.opacity=1;
   finalScoreText.textContent=`10 kérdésből ${finalScore} kérdésen jutottál túl pozitív piával.`;
 }
 
-/* ===== Start overlay ===== */
 startBtn.addEventListener('click',()=>{
   startOverlay.style.display='none';
   renderQuestion();
 });
 restartBtn.addEventListener('click', resetGame);
-
 </script>
 
 </body>
 </html>
+
