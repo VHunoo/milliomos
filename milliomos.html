@@ -85,6 +85,48 @@ const undoBtn = document.getElementById('undoBtn');
 const scoreEl = document.getElementById('score');
 const gameEl = document.getElementById('game');
 
+// ===== Kezdő overlay =====
+function showStartOverlay() {
+  const overlay = document.createElement('div');
+  overlay.id = 'start-overlay';
+  overlay.style.position = 'fixed';
+  overlay.style.top = 0;
+  overlay.style.left = 0;
+  overlay.style.width = '100%';
+  overlay.style.height = '100%';
+  overlay.style.background = 'rgba(0,0,0,0.85)';
+  overlay.style.display = 'flex';
+  overlay.style.alignItems = 'center';
+  overlay.style.justifyContent = 'center';
+  overlay.style.flexDirection = 'column';
+  overlay.style.color = '#fff';
+  overlay.style.zIndex = 9999;
+
+  const title = document.createElement('h2');
+  title.textContent = '🎯 Készen állsz?';
+  title.style.fontSize = '32px';
+  title.style.marginBottom = '20px';
+
+  const startBtn = document.createElement('button');
+  startBtn.textContent = 'Indítás';
+  startBtn.style.padding = '12px 24px';
+  startBtn.style.fontSize = '18px';
+  startBtn.style.border = 'none';
+  startBtn.style.borderRadius = '8px';
+  startBtn.style.cursor = 'pointer';
+  startBtn.style.background = '#ffd54a';
+  startBtn.style.color = '#071428';
+  startBtn.addEventListener('click', () => {
+    overlay.remove();
+    renderQuestion(); // Első kérdés megjelenítése
+  });
+
+  overlay.appendChild(title);
+  overlay.appendChild(startBtn);
+  document.body.appendChild(overlay);
+}
+
+// ===== Játék funkciók =====
 function renderQuestion() {
   if (gameOver) return;
 
@@ -153,24 +195,19 @@ function checkAnswer() {
   const correct = item.correctIndex;
   document.querySelectorAll('.ans-btn')[correct].classList.add('correct');
 
-  let gainedPoints = currentBets[correct]; // Jó válaszra rakott pontok száma
-
-  // Ha sikerült legalább 1 pont a jó válaszra, számít sikeres továbbjutás
+  let gainedPoints = currentBets[correct]; 
   if (gainedPoints > 0) {
-    finalScore += 1; // Összpontnál 1-et adunk
+    finalScore += 1; // Összpontnál 1-et adunk, ha sikerült
   }
 
-  // Következő kérdéshez marad a jó válaszra rakott pontok száma
   availablePoints = gainedPoints;
 
-  // Rossz válaszokra rakott pontok jelzése
   currentBets.forEach((bet, i) => {
     if (bet > 0 && i !== correct) {
       document.querySelectorAll('.ans-btn')[i].classList.add('wrong');
     }
   });
 
-  // Frissítjük az összpontot
   scoreEl.textContent = finalScore;
 
   if (availablePoints <= 0) {
@@ -179,8 +216,6 @@ function checkAnswer() {
     feedbackEl.textContent = `✅ Sikeres továbbjutás! Következő kérdésre marad: ${availablePoints} pont`;
   }
 }
-
-
 
 nextBtn.addEventListener('click', () => {
   if (gameOver) return;
@@ -205,7 +240,7 @@ function resetGame() {
   gameOver = false;
   gameEl.classList.remove('game-over');
   document.querySelector('.game-over-overlay')?.remove();
-  renderQuestion();
+  showStartOverlay();
 }
 
 function endGame() {
@@ -270,11 +305,13 @@ function endGame() {
   gameEl.classList.add('game-over');
 }
 
-renderQuestion();
+// ===== Indítás =====
+showStartOverlay();
 
   </script>
 </body>
 </html>
+
 
 
 
