@@ -82,12 +82,31 @@ h1 { font-size:22px; margin:0; color:#fff; }
 .ans-btn:hover { transform: translateY(-2px); box-shadow:0 8px 20px rgba(0,0,0,0.5); }
 .ans-btn:active { transform: translateY(1px); }
 .ans-btn.disabled { opacity:0.6; pointer-events:none; }
-.ans-btn .text {
-  color: #ffffff;
-}
+.ans-btn .text { color:#ffffff; flex:1; }
 
 .letter { width:36px; height:36px; border-radius:8px; background: rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; }
-.points-indicator { position:absolute; top:6px; right:10px; font-size:12px; color:var(--accent); opacity:0.9; transition:transform 0.2s ease, opacity 0.3s ease; }
+
+.cups {
+  position:absolute;
+  bottom:6px; right:10px;
+  display:flex; gap:4px;
+  font-size:16px;
+}
+.beer {
+  font-size:18px;
+  opacity:0;
+  transform:translateY(8px) scale(0.6);
+  animation: popIn 0.3s forwards ease-out;
+}
+@keyframes popIn {
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
+.beer.remove {
+  animation: popOut 0.25s forwards ease-in;
+}
+@keyframes popOut {
+  to { opacity:0; transform:translateY(10px) scale(0.5); }
+}
 
 .feedback { margin-top:14px; min-height:28px; font-size:16px; color:#ffd54a; }
 
@@ -104,10 +123,7 @@ button.control {
 button.control:hover { background: rgba(255,255,255,0.1); transform: scale(1.05); }
 button.control:active { transform: scale(0.95); }
 
-.flash { animation: flash 0.4s ease; }
-@keyframes flash { 0%{background-color:rgba(255,213,74,0.2)} 100%{background-color:transparent} }
-
-/* Overlay stílusok */
+/* Overlay és piros flash */
 #start-overlay, .game-over-overlay {
   position: fixed; top:0; left:0; width:100%; height:100%;
   display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -132,41 +148,39 @@ button.control:active { transform: scale(0.95); }
 .game-over-box button { padding:12px 24px; border:none; border-radius:8px; background:var(--accent); color:#071428; font-weight:bold; cursor:pointer; transition: transform 0.2s ease; }
 .game-over-box button:hover { transform: scale(1.05); }
 
-
 body.game-over-flash::after {
   content: "";
   position: fixed;
   top: 0; left: 0;
   width: 100%; height: 100%;
-  background: rgba(255, 0, 0, 0.4);
+  background: rgba(255, 0, 0, 0.5);
   z-index: 9000;
   pointer-events: none;
-  animation: redFlash 1.2s ease forwards;
+  animation: redFlash 2s ease forwards;
 }
 @keyframes redFlash {
-  0% { background: rgba(255, 0, 0, 0.6); }
-  50% { background: rgba(255, 0, 0, 0.4); }
+  0% { background: rgba(255, 0, 0, 0.8); }
+  50% { background: rgba(255, 0, 0, 0.5); }
   100% { background: rgba(255, 0, 0, 0); }
 }
-
 </style>
 </head>
 <body>
 
 <div class="stars"></div>
 
-<div class="container" role="application" aria-labelledby="title">
+<div class="container">
   <header>
     <div class="logo">Ló</div>
     <div>
-      <h1 id="title">Legyen Ön is Milliomos</h1>
-      <div class="meta">Kattints a válaszra, hogy piát tegyél rá (összesen 10). Visszavonás és Megnézem gombokkal irányíthatod.</div>
+      <h1>Legyen Ön is Milliomos</h1>
+      <div class="meta">Kattints a válaszra, hogy piát tegyél rá 🍺 (összesen 10). Visszavonás és Megnézem gombokkal irányíthatod.</div>
     </div>
   </header>
   <div class="card" id="game">
     <div class="question" id="question"></div>
     <div class="answers" id="answers"></div>
-    <div class="feedback" id="feedback" aria-live="polite"></div>
+    <div class="feedback" id="feedback"></div>
     <div class="controls">
       <span>Összpont: <span id="score">0</span> / 10</span>
       <button class="control" id="undoBtn">Visszavonás</button>
@@ -177,13 +191,11 @@ body.game-over-flash::after {
   </div>
 </div>
 
-<!-- Indító overlay -->
 <div id="start-overlay">
   <h2>🎯 Készen állsz?</h2>
   <button id="startBtn">Indítás</button>
 </div>
 
-<!-- Game over overlay -->
 <div class="game-over-overlay" id="gameOverOverlay">
   <div class="game-over-box">
     <h2>🎮 Játék vége!</h2>
@@ -193,118 +205,119 @@ body.game-over-flash::after {
 </div>
 
 <script>
-/* ===== Csillagok generálása ===== */
-const starsContainer = document.querySelector('.stars');
+const starsContainer=document.querySelector('.stars');
 for(let i=0;i<100;i++){
-  const star=document.createElement('div');
-  star.className='star';
-  star.style.top=Math.random()*window.innerHeight+'px';
-  star.style.left=Math.random()*window.innerWidth+'px';
-  star.style.width=(Math.random()*2+1)+'px';
-  star.style.height=(Math.random()*2+1)+'px';
-  star.style.animationDuration=(Math.random()*30+20)+'s';
-  starsContainer.appendChild(star);
+  const s=document.createElement('div');
+  s.className='star';
+  s.style.top=Math.random()*window.innerHeight+'px';
+  s.style.left=Math.random()*window.innerWidth+'px';
+  s.style.width=(Math.random()*2+1)+'px';
+  s.style.height=s.style.width;
+  s.style.animationDuration=(Math.random()*30+20)+'s';
+  starsContainer.appendChild(s);
 }
 
-/* ===== Játék logika ===== */
-const START_POINTS = 10;
-const questions = [
-  { q: 'Melyik évben írták alá a magyar alkotmány jelenlegi változatát?', options: ['2011', '1990', '2004', '2010'], correctIndex: 0 },
-  { q: 'Mi Magyarország fővárosa?', options: ['Debrecen','Szeged','Pécs','Budapest'], correctIndex: 3 },
-  { q: 'Hány színe van a magyar zászlónak?', options: ['2','3','4','5'], correctIndex: 1 },
-  { q: 'Ki írta a Toldi című művet?', options: ['Petőfi Sándor','Jókai Mór','Arany János','Móricz Zsigmond'], correctIndex: 2 },
-  { q: 'Melyik bolygó a Naprendszer legnagyobbika?', options: ['Mars','Föld','Jupiter','Szaturnusz'], correctIndex: 2 }
+const START_POINTS=10;
+const questions=[
+  {q:'Melyik évben írták alá a magyar alkotmány jelenlegi változatát?',options:['2011','1990','2004','2010'],correctIndex:0},
+  {q:'Mi Magyarország fővárosa?',options:['Debrecen','Szeged','Pécs','Budapest'],correctIndex:3},
+  {q:'Hány színe van a magyar zászlónak?',options:['2','3','4','5'],correctIndex:1},
+  {q:'Ki írta a Toldi című művet?',options:['Petőfi Sándor','Jókai Mór','Arany János','Móricz Zsigmond'],correctIndex:2},
+  {q:'Melyik bolygó a Naprendszer legnagyobbika?',options:['Mars','Föld','Jupiter','Szaturnusz'],correctIndex:2}
 ];
 
-let current=0, finalScore=0, availablePoints=START_POINTS, totalPointsPlaced=0, currentBets=[0,0,0,0], betHistory=[], gameOver=false;
+let current=0,finalScore=0,availablePoints=START_POINTS,totalPointsPlaced=0,currentBets=[0,0,0,0],betHistory=[],gameOver=false;
 
-const questionEl=document.getElementById('question');
-const answersEl=document.getElementById('answers');
-const feedbackEl=document.getElementById('feedback');
-const nextBtn=document.getElementById('nextBtn');
-const resetBtn=document.getElementById('resetBtn');
-const checkBtn=document.getElementById('checkBtn');
-const undoBtn=document.getElementById('undoBtn');
+const qEl=document.getElementById('question');
+const aEl=document.getElementById('answers');
+const fEl=document.getElementById('feedback');
 const scoreEl=document.getElementById('score');
-const gameEl=document.getElementById('game');
-
+const checkBtn=document.getElementById('checkBtn');
+const nextBtn=document.getElementById('nextBtn');
+const undoBtn=document.getElementById('undoBtn');
+const resetBtn=document.getElementById('resetBtn');
 const startOverlay=document.getElementById('start-overlay');
 const startBtn=document.getElementById('startBtn');
 const gameOverOverlay=document.getElementById('gameOverOverlay');
 const finalScoreText=document.getElementById('finalScoreText');
 const restartBtn=document.getElementById('restartBtn');
 
-function renderQuestion() {
-  if(gameOver) return;
+function renderQuestion(){
+  if(gameOver)return;
   const item=questions[current];
-  questionEl.textContent=item.q;
-  answersEl.innerHTML='';
-  feedbackEl.textContent='';
+  qEl.textContent=item.q;
+  aEl.innerHTML=''; fEl.textContent='';
   currentBets=[0,0,0,0]; betHistory=[]; totalPointsPlaced=0;
 
   item.options.forEach((opt,i)=>{
     const btn=document.createElement('button');
     btn.className='ans-btn';
     btn.setAttribute('data-index',i);
-    btn.innerHTML=`<span class="letter">${String.fromCharCode(65+i)}</span><span class="text">${opt}</span><span class="points-indicator" id="points-${i}">0</span>`;
+    btn.innerHTML=`
+      <span class="letter">${String.fromCharCode(65+i)}</span>
+      <span class="text">${opt}</span>
+      <div class="cups" id="cups-${i}"></div>
+    `;
     btn.addEventListener('click',()=>addPoint(i));
-    answersEl.appendChild(btn);
+    aEl.appendChild(btn);
   });
 
-  feedbackEl.textContent=`🎯 Elérhető piák: ${availablePoints}`;
+  fEl.textContent=`🎯 Elérhető piák: ${availablePoints}`;
 }
 
-function addPoint(i) {
-  if(totalPointsPlaced>=availablePoints){ feedbackEl.textContent=`❌ Már elhelyezted az összes (${availablePoints}) piát!`; return; }
+function addPoint(i){
+  if(totalPointsPlaced>=availablePoints){fEl.textContent=`❌ Már elhelyezted az összes (${availablePoints}) piát!`;return;}
   currentBets[i]++; totalPointsPlaced++; betHistory.push(i);
-  updatePointsDisplay(i); feedbackEl.textContent=`➕ Hozzáadtál 1 piát (${totalPointsPlaced}/${availablePoints} felhasználva)`; 
+
+  const cupsEl=document.getElementById(`cups-${i}`);
+  const beer=document.createElement('span');
+  beer.className='beer';
+  beer.textContent='🍺';
+  cupsEl.appendChild(beer);
+
+  fEl.textContent=`➕ Hozzáadtál 1 piát (${totalPointsPlaced}/${availablePoints})`;
 }
 
-function undoLastPoint() {
-  if(betHistory.length===0){ feedbackEl.textContent='⚠️ Nincs több visszavonható pia.'; return; }
+function undoLastPoint(){
+  if(betHistory.length===0){fEl.textContent='⚠️ Nincs több visszavonható pia.';return;}
   const last=betHistory.pop(); currentBets[last]--; totalPointsPlaced--;
-  updatePointsDisplay(last);
-  feedbackEl.textContent=`↩️ Visszavontál 1 piát (${totalPointsPlaced}/${availablePoints} felhasználva)`;
+  const cupsEl=document.getElementById(`cups-${last}`);
+  const beers=cupsEl.querySelectorAll('.beer');
+  if(beers.length>0){
+    const lastBeer=beers[beers.length-1];
+    lastBeer.classList.add('remove');
+    setTimeout(()=>lastBeer.remove(),200);
+  }
+  fEl.textContent=`↩️ Visszavontál 1 piát (${totalPointsPlaced}/${availablePoints})`;
 }
-
-function updatePointsDisplay(i){ document.getElementById(`points-${i}`).textContent=currentBets[i]; }
 
 function checkAnswer(){
-  if(gameOver) return;
+  if(gameOver)return;
   const item=questions[current];
   document.querySelectorAll('.ans-btn').forEach(b=>b.classList.add('disabled'));
   const correct=item.correctIndex;
   document.querySelectorAll('.ans-btn')[correct].classList.add('correct');
 
   let gainedPoints=currentBets[correct];
-  if(gainedPoints>0) finalScore+=1;
+  if(gainedPoints>0)finalScore++;
   availablePoints=gainedPoints;
 
-  currentBets.forEach((bet,i)=>{
-    if(bet>0 && i!==correct) document.querySelectorAll('.ans-btn')[i].classList.add('wrong');
-  });
-
+  currentBets.forEach((bet,i)=>{if(bet>0&&i!==correct)document.querySelectorAll('.ans-btn')[i].classList.add('wrong');});
   scoreEl.textContent=finalScore;
 
-  if(availablePoints<=0) setTimeout(endGame,500);
-  else feedbackEl.textContent=`✅ Sikeres továbbjutás! Következő kérdésre marad: ${availablePoints} pia`;
+  if(availablePoints<=0)setTimeout(endGame,500);
+  else fEl.textContent=`✅ Továbbjutás! Következő kérdésre marad: ${availablePoints} pia`;
 }
 
-nextBtn.addEventListener('click',()=>{
-  if(gameOver||availablePoints<=0) return;
-  current++;
-  if(current>=questions.length){ endGame(); return; }
-  renderQuestion();
-});
-
-resetBtn.addEventListener('click', resetGame);
-checkBtn.addEventListener('click', checkAnswer);
-undoBtn.addEventListener('click', undoLastPoint);
+nextBtn.onclick=()=>{if(gameOver||availablePoints<=0)return;current++;if(current>=questions.length){endGame();return;}renderQuestion();};
+resetBtn.onclick=resetGame;
+checkBtn.onclick=checkAnswer;
+undoBtn.onclick=undoLastPoint;
 
 function resetGame(){
   document.body.classList.remove('game-over-flash');
-  current=0; finalScore=0; availablePoints=START_POINTS; gameOver=false;
-  scoreEl.textContent=0; gameOverOverlay.style.display='none';
+  current=0;finalScore=0;availablePoints=START_POINTS;gameOver=false;
+  scoreEl.textContent=0;gameOverOverlay.style.display='none';
   startOverlay.style.display='flex';
 }
 
@@ -316,13 +329,8 @@ function endGame(){
   finalScoreText.textContent=`10 kérdésből ${finalScore} kérdésen jutottál túl pozitív piával.`;
 }
 
-startBtn.addEventListener('click',()=>{
-  startOverlay.style.display='none';
-  renderQuestion();
-});
-restartBtn.addEventListener('click', resetGame);
+startBtn.onclick=()=>{startOverlay.style.display='none';renderQuestion();};
+restartBtn.onclick=resetGame;
 </script>
-
 </body>
 </html>
-
