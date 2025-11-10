@@ -5,63 +5,90 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Játék Menü</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
     :root {
-      --bg: #071428;
-      --btn-bg: #ffd54a;
+      --bg-gradient: linear-gradient(135deg, #0f2b45, #071428);
+      --btn-gradient: linear-gradient(135deg, #ffd54a, #ffb84d);
+      --btn-hover: linear-gradient(135deg, #ffe066, #ffc107);
       --btn-color: #071428;
-      --btn-hover: #ffc107;
+      --text-color: #fff;
+      --shadow-color: rgba(0,0,0,0.5);
     }
 
     * {
       box-sizing: border-box;
-      font-family: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      font-family: 'Inter', sans-serif;
     }
 
     body {
       margin: 0;
       min-height: 100vh;
       display: flex;
-      justify-content: center;
       align-items: center;
-      background: linear-gradient(135deg, #0f2b45, #071428);
-      color: #fff;
+      justify-content: center;
+      background: var(--bg-gradient);
     }
 
     .menu-container {
       text-align: center;
+      background: rgba(15, 43, 69, 0.85);
+      padding: 50px 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px var(--shadow-color);
+      border: 1px solid rgba(255,255,255,0.1);
     }
 
     h1 {
-      font-size: 32px;
-      margin-bottom: 40px;
-      color: #ffd54a;
+      font-size: 36px;
+      margin-bottom: 50px;
+      color: var(--text-color);
+      text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
     }
 
     .menu-btn {
       display: block;
-      width: 200px;
-      padding: 16px;
-      margin: 12px auto;
-      font-size: 18px;
-      font-weight: bold;
-      background-color: var(--btn-bg);
+      width: 220px;
+      margin: 15px auto;
+      padding: 16px 0;
+      font-size: 20px;
+      font-weight: 600;
+      background: var(--btn-gradient);
       color: var(--btn-color);
       border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: transform 0.2s ease, background-color 0.2s ease;
+      border-radius: 12px;
       text-decoration: none;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
+      box-shadow: 0 5px 15px var(--shadow-color);
     }
 
     .menu-btn:hover {
-      background-color: var(--btn-hover);
-      transform: scale(1.05);
+      background: var(--btn-hover);
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 8px 20px var(--shadow-color);
+    }
+
+    .menu-btn:active {
+      transform: translateY(0) scale(0.98);
+      box-shadow: 0 4px 12px var(--shadow-color);
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 28px;
+      }
+      .menu-btn {
+        width: 180px;
+        font-size: 18px;
+        padding: 14px 0;
+      }
     }
   </style>
 </head>
 <body>
   <div class="menu-container">
-    <h1>Válassz játékot</h1>
+    <h1>Válassz játékost</h1>
     <a href="balazs.html" class="menu-btn">Balázs</a>
     <a href="gyula.html" class="menu-btn">Gyula</a>
     <a href="dani.html" class="menu-btn">Dani</a>
@@ -69,3 +96,4 @@
   </div>
 </body>
 </html>
+
