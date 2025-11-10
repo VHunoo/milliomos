@@ -1,99 +1,132 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Játék Menü</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Játék Menü</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-gradient: linear-gradient(135deg, #0f2b45, #071428);
+    --btn-gradient1: linear-gradient(135deg, #ffd54a, #ffb84d);
+    --btn-gradient2: linear-gradient(135deg, #6bc1ff, #4a90e2);
+    --btn-gradient3: linear-gradient(135deg, #ff6b6b, #ff3d3d);
+    --btn-gradient4: linear-gradient(135deg, #51cf66, #28a745);
+    --btn-shadow: rgba(0,0,0,0.5);
+    --text-color: #fff;
+  }
 
-    :root {
-      --bg-gradient: linear-gradient(135deg, #0f2b45, #071428);
-      --btn-gradient: linear-gradient(135deg, #ffd54a, #ffb84d);
-      --btn-hover: linear-gradient(135deg, #ffe066, #ffc107);
-      --btn-color: #071428;
-      --text-color: #fff;
-      --shadow-color: rgba(0,0,0,0.5);
-    }
+  * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--bg-gradient);
+    overflow: hidden;
+    position: relative;
+  }
 
-    * {
-      box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
-    }
+  /* Animált háttér */
+  body::before {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: moveStars 60s linear infinite;
+    z-index: 0;
+  }
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--bg-gradient);
-    }
+  @keyframes moveStars {
+    0% { transform: translate(0,0); }
+    100% { transform: translate(-50px, -50px); }
+  }
 
-    .menu-container {
-      text-align: center;
-      background: rgba(15, 43, 69, 0.85);
-      padding: 50px 40px;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px var(--shadow-color);
-      border: 1px solid rgba(255,255,255,0.1);
-    }
+  .menu-container {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 60px 50px;
+    background: rgba(15,43,69,0.85);
+    border-radius: 25px;
+    box-shadow: 0 15px 40px var(--btn-shadow);
+    border: 1px solid rgba(255,255,255,0.1);
+    animation: fadeIn 1s ease forwards;
+  }
 
-    h1 {
-      font-size: 36px;
-      margin-bottom: 50px;
-      color: var(--text-color);
-      text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
-    }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
 
-    .menu-btn {
-      display: block;
-      width: 220px;
-      margin: 15px auto;
-      padding: 16px 0;
-      font-size: 20px;
-      font-weight: 600;
-      background: var(--btn-gradient);
-      color: var(--btn-color);
-      border: none;
-      border-radius: 12px;
-      text-decoration: none;
-      cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
-      box-shadow: 0 5px 15px var(--shadow-color);
-    }
+  h1 {
+    font-size: 40px;
+    margin-bottom: 60px;
+    color: var(--text-color);
+    text-shadow: 0 0 10px rgba(255,255,255,0.3);
+  }
 
-    .menu-btn:hover {
-      background: var(--btn-hover);
-      transform: translateY(-3px) scale(1.03);
-      box-shadow: 0 8px 20px var(--shadow-color);
-    }
+  .menu-btn {
+    display: block;
+    width: 220px;
+    margin: 15px auto;
+    padding: 18px 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #071428;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 8px 20px var(--btn-shadow);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
 
-    .menu-btn:active {
-      transform: translateY(0) scale(0.98);
-      box-shadow: 0 4px 12px var(--shadow-color);
-    }
+  .menu-btn::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: rgba(255,255,255,0.15);
+    transform: rotate(45deg) translate(-100%, -100%);
+    transition: all 0.5s ease;
+  }
 
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 28px;
-      }
-      .menu-btn {
-        width: 180px;
-        font-size: 18px;
-        padding: 14px 0;
-      }
-    }
-  </style>
+  .menu-btn:hover::after {
+    transform: rotate(45deg) translate(0,0);
+  }
+
+  .menu-btn:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 12px 30px var(--btn-shadow);
+  }
+
+  .btn1 { background: var(--btn-gradient1); }
+  .btn2 { background: var(--btn-gradient2); }
+  .btn3 { background: var(--btn-gradient3); }
+  .btn4 { background: var(--btn-gradient4); }
+
+  @media (max-width: 480px) {
+    h1 { font-size: 28px; }
+    .menu-btn { width: 180px; font-size: 18px; padding: 14px 0; }
+  }
+</style>
 </head>
 <body>
-  <div class="menu-container">
-    <h1>Válassz játékost</h1>
-    <a href="balazs.html" class="menu-btn">Balázs</a>
-    <a href="gyula.html" class="menu-btn">Gyula</a>
-    <a href="dani.html" class="menu-btn">Dani</a>
-    <a href="istvan.html" class="menu-btn">István</a>
-  </div>
+<div class="menu-container">
+  <h1>Válassz játékost</h1>
+  <a href="balazs.html" class="menu-btn btn1">Balázs</a>
+  <a href="gyula.html" class="menu-btn btn2">Gyula</a>
+  <a href="dani.html" class="menu-btn btn3">Dani</a>
+  <a href="istvan.html" class="menu-btn btn4">István</a>
+</div>
 </body>
 </html>
 
