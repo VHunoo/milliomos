@@ -68,7 +68,7 @@ const questions = [
 ];
 
 let current = 0;
-let finalScore = 0;           // 🔹 összesített jó pontok
+let finalScore = 0;           
 let availablePoints = START_POINTS;
 let totalPointsPlaced = 0;
 let currentBets = [0,0,0,0];
@@ -153,11 +153,10 @@ function checkAnswer() {
   const correct = item.correctIndex;
   document.querySelectorAll('.ans-btn')[correct].classList.add('correct');
 
-  let gained = currentBets[correct]; // csak a jó pontok számítanak
+  let gained = currentBets[correct]; 
   finalScore += gained;
   availablePoints = gained;
 
-  // rossz pontok csak vizuálisan jelezve, nem vonódnak le
   currentBets.forEach((bet, i) => {
     if (bet > 0 && i !== correct) {
       document.querySelectorAll('.ans-btn')[i].classList.add('wrong');
@@ -167,7 +166,7 @@ function checkAnswer() {
   scoreEl.textContent = finalScore;
 
   if (availablePoints <= 0) {
-    endGame();
+    setTimeout(endGame, 400); // kicsi késleltetés, hogy látszódjon a feedback
   } else {
     feedbackEl.textContent = `✅ +${gained} pont → Következő kérdésre marad: ${availablePoints}`;
   }
@@ -175,10 +174,7 @@ function checkAnswer() {
 
 nextBtn.addEventListener('click', () => {
   if (gameOver) return;
-  if (availablePoints <= 0) {
-    endGame();
-    return;
-  }
+  if (availablePoints <= 0) return;
   current++;
   if (current >= questions.length) {
     endGame();
@@ -217,9 +213,11 @@ function endGame() {
   gameEl.classList.add('game-over');
   document.getElementById('restartBtn').addEventListener('click', resetGame);
 }
+
   </script>
 </body>
 </html>
+
 
 
 
