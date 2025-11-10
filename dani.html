@@ -36,10 +36,10 @@
 <body>
   <div class="container" role="application" aria-labelledby="title">
     <header>
-      <div class="logo">MO</div>
+      <div class="logo">Ló</div>
       <div>
         <h1 id="title">Legyen Ön is Milliomos - Visszavonás és animáció</h1>
-        <div class="meta">Kattints a válaszra, hogy pontot tegyél rá (összesen 10). A „Visszavonás” gombbal egy korábbi pontot vonhatsz vissza. A „Megnézem” gombbal derül ki, jó-e!</div>
+        <div class="meta">Kattints a válaszra, hogy piát tegyél rá (összesen 10). A „Visszavonás” gombbal egy korábbi piát vonhatsz vissza. A „Megnézem” gombbal derül ki, jó-e!</div>
       </div>
     </header>
     <div class="card" id="game">
@@ -147,12 +147,12 @@ function renderQuestion() {
     answersEl.appendChild(btn);
   });
 
-  feedbackEl.textContent = `🎯 Elérhető pontok: ${availablePoints}`;
+  feedbackEl.textContent = `🎯 Elérhető piák: ${availablePoints}`;
 }
 
 function addPoint(i) {
   if (totalPointsPlaced >= availablePoints) {
-    feedbackEl.textContent = `❌ Már elhelyezted az összes (${availablePoints}) pontot!`;
+    feedbackEl.textContent = `❌ Már elhelyezted az összes (${availablePoints}) piát!`;
     return;
   }
   currentBets[i]++;
@@ -160,12 +160,12 @@ function addPoint(i) {
   betHistory.push(i);
   animateFlash(i);
   updatePointsDisplay(i);
-  feedbackEl.textContent = `➕ Hozzáadtál 1 pontot (${totalPointsPlaced}/${availablePoints} felhasználva)`;
+  feedbackEl.textContent = `➕ Hozzáadtál 1 piát (${totalPointsPlaced}/${availablePoints} felhasználva)`;
 }
 
 function undoLastPoint() {
   if (betHistory.length === 0) {
-    feedbackEl.textContent = '⚠️ Nincs több visszavonható pont.';
+    feedbackEl.textContent = '⚠️ Nincs több visszavonható pia.';
     return;
   }
   const last = betHistory.pop();
@@ -173,7 +173,7 @@ function undoLastPoint() {
   totalPointsPlaced--;
   animateFlash(last);
   updatePointsDisplay(last);
-  feedbackEl.textContent = `↩️ Visszavontál 1 pontot (${totalPointsPlaced}/${availablePoints} felhasználva)`;
+  feedbackEl.textContent = `↩️ Visszavontál 1 piát (${totalPointsPlaced}/${availablePoints} felhasználva)`;
 }
 
 function updatePointsDisplay(i) {
@@ -213,7 +213,7 @@ function checkAnswer() {
   if (availablePoints <= 0) {
     setTimeout(endGame, 400);
   } else {
-    feedbackEl.textContent = `✅ Sikeres továbbjutás! Következő kérdésre marad: ${availablePoints} pont`;
+    feedbackEl.textContent = `✅ Sikeres továbbjutás! Következő kérdésre marad: ${availablePoints} pia`;
   }
 }
 
@@ -276,7 +276,7 @@ function endGame() {
   title.style.marginBottom = '16px';
   title.style.fontSize = '28px';
   const scoreText = document.createElement('p');
-  scoreText.textContent = `10 kérdésből ${finalScore} kérdésen jutottál túl pozitív ponttal.`;
+  scoreText.textContent = `10 kérdésből ${finalScore} kérdésen jutottál túl pozitív piával.`;
   scoreText.style.fontSize = '18px';
   scoreText.style.marginBottom = '20px';
 
@@ -311,4 +311,3 @@ showStartOverlay();
   </script>
 </body>
 </html>
-
