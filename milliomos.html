@@ -153,30 +153,33 @@ function checkAnswer() {
   const correct = item.correctIndex;
   document.querySelectorAll('.ans-btn')[correct].classList.add('correct');
 
-  // Csak a jó válaszra rakott pontok számítanak
-  let gained = currentBets[correct]; 
+  let gainedPoints = currentBets[correct]; // Jó válaszra rakott pontok száma
 
-  // Összpont csak a jó válaszokból
-  finalScore += gained;
+  // Ha sikerült legalább 1 pont a jó válaszra, számít sikeres továbbjutás
+  if (gainedPoints > 0) {
+    finalScore += 1; // Összpontnál 1-et adunk
+  }
 
-  // Következő kérdéshez: csak a jó válaszra rakott pont marad
-  availablePoints = gained;
+  // Következő kérdéshez marad a jó válaszra rakott pontok száma
+  availablePoints = gainedPoints;
 
+  // Rossz válaszokra rakott pontok jelzése
   currentBets.forEach((bet, i) => {
     if (bet > 0 && i !== correct) {
       document.querySelectorAll('.ans-btn')[i].classList.add('wrong');
     }
   });
 
-  // Csak a valós összpont
+  // Frissítjük az összpontot
   scoreEl.textContent = finalScore;
 
   if (availablePoints <= 0) {
     setTimeout(endGame, 400);
   } else {
-    feedbackEl.textContent = `✅ +${gained} pont → Következő kérdésre marad: ${availablePoints}`;
+    feedbackEl.textContent = `✅ Sikeres továbbjutás! Következő kérdésre marad: ${availablePoints} pont`;
   }
 }
+
 
 
 nextBtn.addEventListener('click', () => {
@@ -272,6 +275,7 @@ renderQuestion();
   </script>
 </body>
 </html>
+
 
 
 
