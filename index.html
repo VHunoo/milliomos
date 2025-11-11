@@ -11,7 +11,6 @@
     --btn-gradient2: linear-gradient(135deg, #6bc1ff, #4a90e2);
     --btn-gradient3: linear-gradient(135deg, #ff6b6b, #ff3d3d);
     --btn-gradient4: linear-gradient(135deg, #51cf66, #28a745);
-    --btn-shadow: rgba(0,0,0,0.5);
     --text-color: #fff;
   }
 
@@ -22,12 +21,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background: radial-gradient(circle at 20% 30%, #0f2b45, #071428 80%);
+    background: radial-gradient(circle at 50% 50%, #0f2b45, #071428 90%);
     overflow: hidden;
     position: relative;
+    transition: background-position 0.2s ease;
   }
 
-  /* Dinamikus csillagok/particle hatás */
   .stars {
     position: absolute;
     width: 100%;
@@ -36,7 +35,6 @@
     z-index: 0;
     overflow: hidden;
   }
-
   .star {
     position: absolute;
     width: 2px;
@@ -46,12 +44,12 @@
     opacity: 0.8;
     animation: moveStar linear infinite;
   }
-
   @keyframes moveStar {
-    from { transform: translateY(0) translateX(0); }
-    to { transform: translateY(-1000px) translateX(100px); }
+    from { transform: translateY(0); opacity: 0.8; }
+    to { transform: translateY(-1000px); opacity: 0; }
   }
 
+  /* Menü konténer */
   .menu-container {
     position: relative;
     z-index: 1;
@@ -62,6 +60,7 @@
     box-shadow: 0 15px 40px rgba(0,0,0,0.5);
     border: 1px solid rgba(255,255,255,0.1);
     animation: fadeIn 1s ease forwards;
+    backdrop-filter: blur(6px);
   }
 
   @keyframes fadeIn {
@@ -71,11 +70,27 @@
 
   h1 {
     font-size: 40px;
-    margin-bottom: 60px;
+    margin-bottom: 25px;
     color: var(--text-color);
     text-shadow: 0 0 15px rgba(255,255,255,0.3);
   }
 
+  /* Fénycsík a cím alatt */
+  .glow-line {
+    width: 160px;
+    height: 4px;
+    margin: 0 auto 40px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #ffd54a, #4a90e2, #ff3d3d, #51cf66);
+    background-size: 400%;
+    animation: flow 6s linear infinite;
+  }
+  @keyframes flow {
+    from { background-position: 0%; }
+    to { background-position: 400%; }
+  }
+
+  /* Menü gombok */
   .menu-btn {
     display: block;
     width: 220px;
@@ -92,31 +107,41 @@
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: rise 0.8s ease forwards;
   }
 
-  .menu-btn::after {
+  @keyframes rise {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .menu-btn:nth-of-type(2) { animation-delay: 0.2s; }
+  .menu-btn:nth-of-type(3) { animation-delay: 0.4s; }
+  .menu-btn:nth-of-type(4) { animation-delay: 0.6s; }
+
+  .menu-btn::before {
     content: '';
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: rgba(255,255,255,0.15);
-    transform: rotate(45deg) translate(-100%, -100%);
-    transition: all 0.5s ease;
+    inset: 0;
+    background: radial-gradient(circle, rgba(255,255,255,0.3), transparent 70%);
+    opacity: 0;
+    transform: scale(0);
+    transition: transform .5s ease, opacity .5s ease;
   }
 
-  .menu-btn:hover::after {
-    transform: rotate(45deg) translate(0,0);
+  .menu-btn:hover::before {
+    opacity: 1;
+    transform: scale(1.8);
   }
 
   .menu-btn:hover {
     transform: translateY(-5px) scale(1.05);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.6);
   }
 
   .menu-btn:active {
-    transform: translateY(0) scale(0.98);
+    transform: scale(0.96);
     box-shadow: 0 4px 12px rgba(0,0,0,0.5);
   }
 
@@ -125,6 +150,7 @@
   .btn3 { background: var(--btn-gradient3); }
   .btn4 { background: var(--btn-gradient4); }
 
+  /* Kis képernyőre optimalizálás */
   @media (max-width: 480px) {
     h1 { font-size: 28px; }
     .menu-btn { width: 180px; font-size: 18px; padding: 14px 0; }
@@ -133,11 +159,14 @@
 </head>
 <body>
 
-<!-- Csillagok generálása -->
+<!-- Csillagos háttér -->
 <div class="stars"></div>
 
+<!-- Menü -->
 <div class="menu-container">
   <h1>Válassz játékost</h1>
+  <div class="glow-line"></div>
+
   <a href="balazs.html" class="menu-btn btn1">Balázs</a>
   <a href="gyula.html" class="menu-btn btn2">Gyula</a>
   <a href="dani.html" class="menu-btn btn3">Dani</a>
@@ -145,18 +174,39 @@
 </div>
 
 <script>
-  // Generáljunk 100 csillagot a háttérhez
+  // ⭐ Csillagok generálása és parallax mozgás
   const starsContainer = document.querySelector('.stars');
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 150; i++) {
     const star = document.createElement('div');
     star.className = 'star';
     star.style.top = Math.random() * window.innerHeight + 'px';
     star.style.left = Math.random() * window.innerWidth + 'px';
     star.style.width = (Math.random() * 2 + 1) + 'px';
     star.style.height = (Math.random() * 2 + 1) + 'px';
-    star.style.animationDuration = (Math.random() * 30 + 20) + 's';
+    star.style.animationDuration = (Math.random() * 25 + 15) + 's';
+    star.style.opacity = Math.random();
     starsContainer.appendChild(star);
   }
+
+  document.addEventListener('mousemove', e => {
+    const x = (e.clientX / window.innerWidth - 0.5) * 15;
+    const y = (e.clientY / window.innerHeight - 0.5) * 15;
+    document.body.style.backgroundPosition = `${50 - x}% ${50 - y}%`;
+  });
+
+
+
+  const links = document.querySelectorAll('.menu-btn');
+  links.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      document.body.classList.add('fade-out');
+      setTimeout(() => {
+        window.location.href = link.getAttribute('href');
+      }, 900);
+    });
+  });
+
 </script>
 
 </body>
