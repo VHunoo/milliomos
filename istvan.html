@@ -32,6 +32,83 @@
             padding: 20px;
         }
 
+        /* Segítség ikonok a bal felső sarokban */
+        .help-icons {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .help-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--bg2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            border: 2px solid var(--accent);
+            position: relative;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .help-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .help-icon.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-color: rgba(255, 213, 74, 0.5);
+        }
+
+        .help-icon.disabled:hover {
+            transform: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .help-icon .icon {
+            font-size: 24px;
+            color: var(--accent);
+        }
+
+        .help-icon.disabled .icon {
+            color: rgba(255, 213, 74, 0.5);
+        }
+
+        .help-icon .close-btn {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--bad);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .help-icon:hover .close-btn {
+            opacity: 1;
+        }
+
+        .help-icon.disabled .close-btn {
+            display: none;
+        }
+
         /* Csillagos háttér */
         .stars {
             position: absolute;
@@ -248,6 +325,10 @@
         .ans-btn.disabled {
             opacity: 0.6;
             pointer-events: none;
+        }
+
+        .ans-btn.hidden {
+            display: none;
         }
 
         .ans-btn .text {
@@ -652,6 +733,24 @@
             }
         }
 
+        /* Refill gomb stílus */
+        .refill-btn {
+            background: linear-gradient(135deg, #4dabf7, #339af0);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            font-size: 16px;
+            margin: 5px;
+        }
+
+        .refill-btn:hover {
+            transform: scale(1.05);
+        }
+
         /* Reszponzív design */
         @media (max-width: 1400px) {
             .main-content {
@@ -700,6 +799,21 @@
         }
 
         @media (max-width: 768px) {
+            .help-icons {
+                top: 10px;
+                left: 10px;
+                gap: 10px;
+            }
+            
+            .help-icon {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .help-icon .icon {
+                font-size: 20px;
+            }
+            
             .beer-counter {
                 top: 10px;
                 padding: 12px 20px;
@@ -795,6 +909,22 @@
     </style>
 </head>
 <body>
+    <!-- Segítség ikonok a bal felső sarokban -->
+    <div class="help-icons">
+        <div class="help-icon" id="help-1">
+            <div class="icon">½</div>
+            <div class="close-btn">X</div>
+        </div>
+        <div class="help-icon" id="help-2">
+            <div class="icon">📞</div>
+            <div class="close-btn">X</div>
+        </div>
+        <div class="help-icon" id="help-3">
+            <div class="icon">👥</div>
+            <div class="close-btn">X</div>
+        </div>
+    </div>
+
     <!-- Elérhető piák a képernyő tetején -->
     <div class="beer-counter">
         <div class="beer-counter-content">
@@ -874,6 +1004,7 @@
             <div class="button-group">
                 <button id="restartBtn">Új játék</button>
                 <button id="backToHomeBtn">Vissza a főoldalra</button>
+                <button class="refill-btn" id="refillBtn" style="display:none">REFILL (+5 pia)</button>
             </div>
         </div>
     </div>
@@ -905,6 +1036,80 @@
             starsContainer.appendChild(s);
         }
 
+        // Segítség ikonok kezelése
+        const helpIcons = document.querySelectorAll('.help-icon');
+        let helpUsed = {
+            halve: false,
+            phone: false,
+            audience: false
+        };
+
+        helpIcons.forEach(icon => {
+            const closeBtn = icon.querySelector('.close-btn');
+            closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Megakadályozza, hogy az ikonra kattintás is aktiválódjon
+                icon.style.display = 'none';
+            });
+            
+            icon.addEventListener('click', () => {
+                // Ha már használva volt, ne csináljon semmit
+                if (icon.classList.contains('disabled')) return;
+                
+                const iconId = icon.id;
+                if (iconId === 'help-1') {
+                    if (!helpUsed.halve) {
+                        useHalveHelp();
+                        helpUsed.halve = true;
+                        icon.classList.add('disabled');
+                    }
+                } else if (iconId === 'help-2') {
+                    if (!helpUsed.phone) {
+                        // Csak szürküljön ki, ne csináljon semmit
+                        helpUsed.phone = true;
+                        icon.classList.add('disabled');
+                    }
+                } else if (iconId === 'help-3') {
+                    if (!helpUsed.audience) {
+                        // Csak szürküljön ki, ne csináljon semmit
+                        helpUsed.audience = true;
+                        icon.classList.add('disabled');
+                    }
+                }
+            });
+        });
+
+        // Felező segítség funkció
+        function useHalveHelp() {
+            const currentQuestionData = questions[currentQuestion];
+            const correctIndex = currentQuestionData.correctIndex;
+            
+            // Összegyűjtjük a rossz válaszok indexeit
+            const wrongIndices = [];
+            for (let i = 0; i < 4; i++) {
+                if (i !== correctIndex) {
+                    wrongIndices.push(i);
+                }
+            }
+            
+            // Véletlenszerűen kiválasztunk két rossz választ, amit elrejtünk
+            const randomWrongIndex1 = wrongIndices[Math.floor(Math.random() * wrongIndices.length)];
+            
+            // Eltávolítjuk az első kiválasztott rossz választ
+            wrongIndices.splice(wrongIndices.indexOf(randomWrongIndex1), 1);
+            
+            // Kiválasztjuk a második rossz választ
+            const randomWrongIndex2 = wrongIndices[Math.floor(Math.random() * wrongIndices.length)];
+            
+            // Elrejtjük a kiválasztott rossz válaszokat
+            const answerButtons = document.querySelectorAll('.ans-btn');
+            answerButtons[randomWrongIndex1].classList.add('hidden');
+            answerButtons[randomWrongIndex2].classList.add('hidden');
+            
+            // Frissítjük a feedback-et
+            const fEl = document.getElementById('feedback');
+            fEl.textContent = `✅ Felező segítség: Eltávolítottunk két rossz választ!`;
+        }
+
         // Játékállapot
         const START_POINTS = 10;
         const questions = [
@@ -932,27 +1137,7 @@
                 q: 'Melyik bolygó forog ellentétes irányba, mint a legtöbb másik?',
                 options: ['Vénusz', 'Mars', 'Uránusz', 'Neptunusz'],
                 correctIndex: 0
-            },            {
-                q: 'Melyik bolygót nevezik "Vörös Bolygónak"?',
-                options: ['Vénusz', 'Mars', 'Jupiter', 'Merkúr'],
-                correctIndex: 1
-            },            {
-                q: 'Melyik bolygót nevezik "Vörös Bolygónak"?',
-                options: ['Vénusz', 'Mars', 'Jupiter', 'Merkúr'],
-                correctIndex: 1
-            },            {
-                q: 'Melyik bolygót nevezik "Vörös Bolygónak"?',
-                options: ['Vénusz', 'Mars', 'Jupiter', 'Merkúr'],
-                correctIndex: 1
-            },            {
-                q: 'Melyik bolygót nevezik "Vörös Bolygónak"?',
-                options: ['Vénusz', 'Mars', 'Jupiter', 'Merkúr'],
-                correctIndex: 1
-            },            {
-                q: 'Melyik bolygót nevezik "Vörös Bolygónak"?',
-                options: ['Vénusz', 'Mars', 'Jupiter', 'Merkúr'],
-                correctIndex: 1
-            },
+            }
         ];
 
         let currentQuestion = 0;
@@ -983,6 +1168,35 @@
         const winOverlay = document.getElementById('winOverlay');
         const winRestartBtn = document.getElementById('winRestartBtn');
         const winBackToHomeBtn = document.getElementById('winBackToHomeBtn');
+        const refillBtn = document.getElementById('refillBtn');
+
+        // Refill funkció
+        function useRefill() {
+            // +5 pia hozzáadása
+            availablePoints += 5;
+            updateAvailableBeers();
+            
+            // REFILL gomb elrejtése
+            refillBtn.style.display = 'none';
+            
+            // Játék folytatása - eltávolítjuk a piros flash effektet
+            document.body.classList.remove('game-over-flash');
+            gameOver = false;
+            gameOverOverlay.style.display = 'none';
+            
+            // Következő kérdésre lépés
+            currentQuestion++;
+            if (currentQuestion >= questions.length) {
+                // Ellenőrizzük, hogy minden kérdésre helyesen válaszolt-e
+                if (checkIfAllCorrect()) {
+                    showWinScreen();
+                } else {
+                    endGame();
+                }
+                return;
+            }
+            renderQuestion();
+        }
 
         // Visszairányítás a főoldalra
         function goToHomePage() {
@@ -1109,6 +1323,7 @@
             // Következő kérdés gomb letiltása
             nextBtn.classList.add('disabled');
 
+            // Minden válaszlehetőség újra látható
             item.options.forEach((opt, i) => {
                 const btn = document.createElement('button');
                 btn.className = 'ans-btn';
@@ -1178,7 +1393,7 @@
             if (gainedPoints > 0) {
                 finalScore++;
                 correctAnswers.push(currentQuestion);
-                // Zöld flash effekt
+                // Csak zöld flash effekt, ha helyes a válasz
                 triggerGreenFlash();
             }
             availablePoints = gainedPoints;
@@ -1230,6 +1445,23 @@
             correctAnswers = [];
             gameOverOverlay.style.display = 'none';
             winOverlay.style.display = 'none';
+            
+            // Segítségek visszaállítása
+            helpUsed = {
+                halve: false,
+                phone: false,
+                audience: false
+            };
+            
+            // Segítség ikonok visszaállítása
+            helpIcons.forEach(icon => {
+                icon.classList.remove('disabled');
+                icon.style.display = 'flex';
+            });
+            
+            // REFILL gomb elrejtése
+            refillBtn.style.display = 'none';
+            
             updateAvailableBeers();
             initProgressLadder();
             renderQuestion();
@@ -1242,6 +1474,13 @@
             gameOverOverlay.style.display = 'flex';
             gameOverOverlay.style.opacity = 1;
             finalScoreText.textContent = `${questions.length} kérdésből ${finalScore} kérdésen jutottál túl pozitív piával.`;
+            
+            // Ha még vannak kérdések, akkor megjelenítjük a REFILL gombot
+            if (currentQuestion < questions.length - 1) {
+                refillBtn.style.display = 'inline-block';
+            } else {
+                refillBtn.style.display = 'none';
+            }
         }
 
         // Eseménykezelők
@@ -1252,6 +1491,7 @@
         winRestartBtn.onclick = resetGame;
         backToHomeBtn.onclick = goToHomePage;
         winBackToHomeBtn.onclick = goToHomePage;
+        refillBtn.onclick = useRefill;
         startBtn.onclick = () => {
             startOverlay.style.display = 'none';
             updateAvailableBeers();
