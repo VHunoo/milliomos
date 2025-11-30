@@ -1417,6 +1417,15 @@
             
             updateAvailableBeers();
             updateProgressLadder();
+
+            // A checkAnswer() függvény végén add hozzá:
+// Progress mentése
+localStorage.setItem('gameLeaderboard', JSON.stringify({
+  balazs: { name: 'Balázs', progress: currentQuestion+1 },
+  gyula: { name: 'Gyula', progress: 0 }, // Ezeket frissíteni kell
+  dani: { name: 'Dani', progress: 0 },
+  istvan: { name: 'István', progress: 0 }
+}));
         }
 
         // Következő kérdés
@@ -1503,6 +1512,8 @@
         updateAvailableBeers();
         initProgressLadder();
         renderQuestion();
+
+
     </script>
 </body>
 </html>
