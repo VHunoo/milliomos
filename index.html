@@ -208,6 +208,22 @@
   .silver { color: silver; }
   .bronze { color: #cd7f32; }
 
+  .refresh-btn {
+    background: var(--btn-gradient2);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 15px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .refresh-btn:hover {
+    transform: scale(1.05);
+  }
+
   /* Kis képernyőre optimalizálás */
   @media (max-width: 480px) {
     h1 { font-size: 28px; }
@@ -236,8 +252,9 @@
   <div class="leaderboard">
     <h2>🏆 Ranglista</h2>
     <div id="leaderboard-list">
-      <!-- A ranglista JavaScript-el töltődik fel -->
+      <div style="color: white; text-align: center;">Ranglista betöltése...</div>
     </div>
+    <button class="refresh-btn" onclick="loadLeaderboard()">🔄 Frissítés</button>
   </div>
 </div>
 
@@ -273,71 +290,52 @@
     });
   });
 
-  // Egyszerű ranglista adattároló
-  const gameLeaderboard = {
-    players: {
-      balazs: { name: 'Balázs', progress: 0 },
-      gyula: { name: 'Gyula', progress: 0 },
-      dani: { name: 'Dani', progress: 0 },
-      istvan: { name: 'István', progress: 0 }
-    },
-    
-    // Adatok betöltése localStorage-ból
-    loadFromStorage: function() {
-      try {
-        const saved = localStorage.getItem('gameLeaderboard');
-        if (saved) {
-          this.players = JSON.parse(saved);
-        }
-      } catch (e) {
-        console.log('Nincsenek mentett adatok, alapértelmezett értékek használata');
-      }
-    },
-    
-    // Ranglista lekérése
-    getLeaderboard: function() {
-      return Object.values(this.players).sort((a, b) => b.progress - a.progress);
-    }
-  };
-
   // Ranglista betöltése és megjelenítése
   function loadLeaderboard() {
     const leaderboardList = document.getElementById('leaderboard-list');
     
-    // Betöltjük a mentett adatokat
-    gameLeaderboard.loadFromStorage();
-    
-    // Ürítjük a listát
-    leaderboardList.innerHTML = '';
-    
-    // Lekérjük a rendezett ranglistát
-    const leaderboard = gameLeaderboard.getLeaderboard();
-    
-    // Hozzáadjuk a játékosokat a listához
-    leaderboard.forEach((player, index) => {
-      const item = document.createElement('div');
-      item.className = 'leaderboard-item';
+    try {
+      // Betöltjük a mentett adatokat
+      const savedLeaderboard = localStorage.getItem('gameLeaderboard');
       
-      let medal = '';
-      if (index === 0) medal = '<span class="medal gold">🥇</span>';
-      else if (index === 1) medal = '<span class="medal silver">🥈</span>';
-      else if (index === 2) medal = '<span class="medal bronze">🥉</span>';
+      if (!savedLeaderboard) {
+        leaderboardList.innerHTML = '<div style="color: white; text-align: center;">Még senki nem játszott</div>';
+        return;
+      }
       
-      item.innerHTML = `
-        <div class="player-name">
-          ${medal} ${player.name}
-        </div>
-        <div class="player-score">
-          ${player.progress}. kérdés
-        </div>
-      `;
+      const players = JSON.parse(savedLeaderboard);
       
-      leaderboardList.appendChild(item);
-    });
-    
-    // Ha üres a lista
-    if (leaderboard.length === 0) {
-      leaderboardList.innerHTML = '<div style="color: white; text-align: center;">Még senki nem játszott</div>';
+      // Átalakítjuk objektumból tömbbe és rendezzük
+      const playerArray = Object.values(players).sort((a, b) => b.progress - a.progress);
+      
+      // Ürítjük a listát
+      leaderboardList.innerHTML = '';
+      
+      // Hozzáadjuk a játékosokat a listához
+      playerArray.forEach((player, index) => {
+        const item = document.createElement('div');
+        item.className = 'leaderboard-item';
+        
+        let medal = '';
+        if (index === 0) medal = '<span class="medal gold">🥇</span>';
+        else if (index === 1) medal = '<span class="medal silver">🥈</span>';
+        else if (index === 2) medal = '<span class="medal bronze">🥉</span>';
+        
+        item.innerHTML = `
+          <div class="player-name">
+            ${medal} ${player.name}
+          </div>
+          <div class="player-score">
+            ${player.progress}. kérdés
+          </div>
+        `;
+        
+        leaderboardList.appendChild(item);
+      });
+      
+    } catch (error) {
+      console.error('Hiba a ranglista betöltése során:', error);
+      leaderboardList.innerHTML = '<div style="color: white; text-align: center;">Hiba a ranglista betöltése során</div>';
     }
   }
 
