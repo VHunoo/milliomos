@@ -25,6 +25,7 @@
     overflow: hidden;
     position: relative;
     transition: background-position 0.2s ease;
+    padding: 20px;
   }
 
   .stars {
@@ -61,6 +62,8 @@
     border: 1px solid rgba(255,255,255,0.1);
     animation: fadeIn 1s ease forwards;
     backdrop-filter: blur(6px);
+    max-width: 800px;
+    width: 100%;
   }
 
   @keyframes fadeIn {
@@ -150,10 +153,67 @@
   .btn3 { background: var(--btn-gradient3); }
   .btn4 { background: var(--btn-gradient4); }
 
+  /* Ranglista stílusok */
+  .leaderboard {
+    margin-top: 40px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: fadeIn 1s ease 0.8s forwards;
+    opacity: 0;
+  }
+
+  .leaderboard h2 {
+    color: var(--text-color);
+    margin-bottom: 20px;
+    font-size: 24px;
+    text-shadow: 0 0 10px rgba(255,255,255,0.2);
+  }
+
+  .leaderboard-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    color: var(--text-color);
+    transition: all 0.3s ease;
+  }
+
+  .leaderboard-item:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateX(5px);
+  }
+
+  .player-name {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .player-score {
+    font-weight: 700;
+    color: #ffd54a;
+  }
+
+  .medal {
+    font-size: 18px;
+  }
+
+  .gold { color: gold; }
+  .silver { color: silver; }
+  .bronze { color: #cd7f32; }
+
   /* Kis képernyőre optimalizálás */
   @media (max-width: 480px) {
     h1 { font-size: 28px; }
     .menu-btn { width: 180px; font-size: 18px; padding: 14px 0; }
+    .leaderboard { padding: 15px; }
+    .leaderboard h2 { font-size: 20px; }
   }
 </style>
 </head>
@@ -171,6 +231,14 @@
   <a href="gyula.html" class="menu-btn btn2">Gyula</a>
   <a href="dani.html" class="menu-btn btn3">Dani</a>
   <a href="istvan.html" class="menu-btn btn4">István</a>
+
+  <!-- Ranglista -->
+  <div class="leaderboard">
+    <h2>🏆 Ranglista</h2>
+    <div id="leaderboard-list">
+      <!-- A ranglista JavaScript-el töltődik fel -->
+    </div>
+  </div>
 </div>
 
 <script>
@@ -194,8 +262,6 @@
     document.body.style.backgroundPosition = `${50 - x}% ${50 - y}%`;
   });
 
-
-
   const links = document.querySelectorAll('.menu-btn');
   links.forEach(link => {
     link.addEventListener('click', e => {
@@ -207,6 +273,76 @@
     });
   });
 
+  // Egyszerű ranglista adattároló
+  const gameLeaderboard = {
+    players: {
+      balazs: { name: 'Balázs', progress: 0 },
+      gyula: { name: 'Gyula', progress: 0 },
+      dani: { name: 'Dani', progress: 0 },
+      istvan: { name: 'István', progress: 0 }
+    },
+    
+    // Adatok betöltése localStorage-ból
+    loadFromStorage: function() {
+      try {
+        const saved = localStorage.getItem('gameLeaderboard');
+        if (saved) {
+          this.players = JSON.parse(saved);
+        }
+      } catch (e) {
+        console.log('Nincsenek mentett adatok, alapértelmezett értékek használata');
+      }
+    },
+    
+    // Ranglista lekérése
+    getLeaderboard: function() {
+      return Object.values(this.players).sort((a, b) => b.progress - a.progress);
+    }
+  };
+
+  // Ranglista betöltése és megjelenítése
+  function loadLeaderboard() {
+    const leaderboardList = document.getElementById('leaderboard-list');
+    
+    // Betöltjük a mentett adatokat
+    gameLeaderboard.loadFromStorage();
+    
+    // Ürítjük a listát
+    leaderboardList.innerHTML = '';
+    
+    // Lekérjük a rendezett ranglistát
+    const leaderboard = gameLeaderboard.getLeaderboard();
+    
+    // Hozzáadjuk a játékosokat a listához
+    leaderboard.forEach((player, index) => {
+      const item = document.createElement('div');
+      item.className = 'leaderboard-item';
+      
+      let medal = '';
+      if (index === 0) medal = '<span class="medal gold">🥇</span>';
+      else if (index === 1) medal = '<span class="medal silver">🥈</span>';
+      else if (index === 2) medal = '<span class="medal bronze">🥉</span>';
+      
+      item.innerHTML = `
+        <div class="player-name">
+          ${medal} ${player.name}
+        </div>
+        <div class="player-score">
+          ${player.progress}. kérdés
+        </div>
+      `;
+      
+      leaderboardList.appendChild(item);
+    });
+    
+    // Ha üres a lista
+    if (leaderboard.length === 0) {
+      leaderboardList.innerHTML = '<div style="color: white; text-align: center;">Még senki nem játszott</div>';
+    }
+  }
+
+  // Amikor az oldal betöltődik, betöltjük a ranglistát
+  document.addEventListener('DOMContentLoaded', loadLeaderboard);
 </script>
 
 </body>
