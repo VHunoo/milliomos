@@ -1047,12 +1047,11 @@
         helpIcons.forEach(icon => {
             const closeBtn = icon.querySelector('.close-btn');
             closeBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // Megakadályozza, hogy az ikonra kattintás is aktiválódjon
+                e.stopPropagation();
                 icon.style.display = 'none';
             });
             
             icon.addEventListener('click', () => {
-                // Ha már használva volt, ne csináljon semmit
                 if (icon.classList.contains('disabled')) return;
                 
                 const iconId = icon.id;
@@ -1064,13 +1063,11 @@
                     }
                 } else if (iconId === 'help-2') {
                     if (!helpUsed.phone) {
-                        // Csak szürküljön ki, ne csináljon semmit
                         helpUsed.phone = true;
                         icon.classList.add('disabled');
                     }
                 } else if (iconId === 'help-3') {
                     if (!helpUsed.audience) {
-                        // Csak szürküljön ki, ne csináljon semmit
                         helpUsed.audience = true;
                         icon.classList.add('disabled');
                     }
@@ -1083,7 +1080,6 @@
             const currentQuestionData = questions[currentQuestion];
             const correctIndex = currentQuestionData.correctIndex;
             
-            // Összegyűjtjük a rossz válaszok indexeit
             const wrongIndices = [];
             for (let i = 0; i < 4; i++) {
                 if (i !== correctIndex) {
@@ -1091,32 +1087,67 @@
                 }
             }
             
-            // Véletlenszerűen kiválasztunk két rossz választ, amit elrejtünk
             const randomWrongIndex1 = wrongIndices[Math.floor(Math.random() * wrongIndices.length)];
-            
-            // Eltávolítjuk az első kiválasztott rossz választ
             wrongIndices.splice(wrongIndices.indexOf(randomWrongIndex1), 1);
-            
-            // Kiválasztjuk a második rossz választ
             const randomWrongIndex2 = wrongIndices[Math.floor(Math.random() * wrongIndices.length)];
             
-            // Elrejtjük a kiválasztott rossz válaszokat
             const answerButtons = document.querySelectorAll('.ans-btn');
             answerButtons[randomWrongIndex1].classList.add('hidden');
             answerButtons[randomWrongIndex2].classList.add('hidden');
             
-            // Frissítjük a feedback-et
             const fEl = document.getElementById('feedback');
             fEl.textContent = `✅ Felező segítség: Eltávolítottunk két rossz választ!`;
         }
 
+// PROGRESS MENTÉS FUNKCIÓ - JAVÍTOTT
+function savePlayerProgress(playerName) {
+    try {
+        const currentLeaderboard = JSON.parse(localStorage.getItem('gameLeaderboard') || '{}');
+        
+        // Csak akkor mentjük a progress-t, ha a játékos sikeresen teljesítette a kérdést
+        // Vagyis ha pozitív piája maradt a kérdés után
+        if (availablePoints > 0) {
+            let actualProgress = currentQuestion + 1;
+            
+            // Ha nyertünk (minden kérdés helyes), akkor 5. kérdés
+            if (checkIfAllCorrect()) {
+                actualProgress = 5;
+            }
+            // Ha az utolsó kérdésnél vagyunk és még nem nyertünk, de helyes a válasz
+            else if (currentQuestion === 4 && availablePoints > 0) {
+                actualProgress = 5;
+            }
+            // Egyébként csak a jelenlegi kérdés száma
+            else {
+                actualProgress = Math.min(currentQuestion + 1, 5);
+            }
+            
+            // Csak akkor mentjük, ha ez magasabb progress, mint az előző
+            const currentProgress = currentLeaderboard[playerName]?.progress || 0;
+            if (actualProgress > currentProgress) {
+                currentLeaderboard[playerName] = { 
+                    name: playerName.charAt(0).toUpperCase() + playerName.slice(1), 
+                    progress: actualProgress 
+                };
+                
+                localStorage.setItem('gameLeaderboard', JSON.stringify(currentLeaderboard));
+                console.log(`${playerName} progress mentve: ${actualProgress}. kérdés`);
+            }
+        } else {
+            // Ha nincs piája, akkor nem mentjük a progress-t
+            console.log(`${playerName} nem teljesítette a ${currentQuestion + 1}. kérdést, progress nem mentve`);
+        }
+    } catch (e) {
+        console.error('Hiba a progress mentése során:', e);
+    }
+}
         // Játékállapot
         const START_POINTS = 10;
         const questions = [
             {
                 q: 'A naprendszer tömegének hány százalékát teszi ki a nap?',
                 options: ['64,3%', '92,3%', '99,8%', '78,5%'],
-                correctIndex: 2 // 99,8% a helyes válasz
+                correctIndex: 2
             },
             {
                 q: 'Melyik bolygó a legnagyobb a Naprendszerben?',
@@ -1172,22 +1203,15 @@
 
         // Refill funkció
         function useRefill() {
-            // +5 pia hozzáadása
             availablePoints += 5;
             updateAvailableBeers();
-            
-            // REFILL gomb elrejtése
             refillBtn.style.display = 'none';
-            
-            // Játék folytatása - eltávolítjuk a piros flash effektet
             document.body.classList.remove('game-over-flash');
             gameOver = false;
             gameOverOverlay.style.display = 'none';
             
-            // Következő kérdésre lépés
             currentQuestion++;
             if (currentQuestion >= questions.length) {
-                // Ellenőrizzük, hogy minden kérdésre helyesen válaszolt-e
                 if (checkIfAllCorrect()) {
                     showWinScreen();
                 } else {
@@ -1320,10 +1344,8 @@
             totalPointsPlaced = 0;
             answerChecked = false;
             
-            // Következő kérdés gomb letiltása
             nextBtn.classList.add('disabled');
 
-            // Minden válaszlehetőség újra látható
             item.options.forEach((opt, i) => {
                 const btn = document.createElement('button');
                 btn.className = 'ans-btn';
@@ -1381,7 +1403,7 @@
             updateBeerBadges();
         }
 
-        // Válasz ellenőrzése
+        // Válasz ellenőrzése - JAVÍTOTT
         function checkAnswer() {
             if (gameOver) return;
             const item = questions[currentQuestion];
@@ -1393,7 +1415,6 @@
             if (gainedPoints > 0) {
                 finalScore++;
                 correctAnswers.push(currentQuestion);
-                // Csak zöld flash effekt, ha helyes a válasz
                 triggerGreenFlash();
             }
             availablePoints = gainedPoints;
@@ -1402,11 +1423,9 @@
                 if (bet > 0 && i !== correct) document.querySelectorAll('.ans-btn')[i].classList.add('wrong');
             });
 
-            // Következő kérdés gomb aktiválása
             nextBtn.classList.remove('disabled');
             answerChecked = true;
 
-            // Ellenőrizzük, hogy minden kérdésre helyesen válaszolt-e
             if (checkIfAllCorrect()) {
                 setTimeout(showWinScreen, 500);
             } else if (availablePoints <= 0) {
@@ -1414,6 +1433,9 @@
             } else {
                 fEl.textContent = `✅ Továbbjutás! Következő kérdésre marad: ${availablePoints} pia`;
             }
+            
+            // PROGRESS MENTÉS - ITT HIVATKOZZUK MEG
+            savePlayerProgress('istvan');
             
             updateAvailableBeers();
             updateProgressLadder();
@@ -1424,7 +1446,6 @@
             if (gameOver || availablePoints <= 0 || !answerChecked) return;
             currentQuestion++;
             if (currentQuestion >= questions.length) {
-                // Ellenőrizzük, hogy minden kérdésre helyesen válaszolt-e
                 if (checkIfAllCorrect()) {
                     showWinScreen();
                 } else {
@@ -1446,20 +1467,17 @@
             gameOverOverlay.style.display = 'none';
             winOverlay.style.display = 'none';
             
-            // Segítségek visszaállítása
             helpUsed = {
                 halve: false,
                 phone: false,
                 audience: false
             };
             
-            // Segítség ikonok visszaállítása
             helpIcons.forEach(icon => {
                 icon.classList.remove('disabled');
                 icon.style.display = 'flex';
             });
             
-            // REFILL gomb elrejtése
             refillBtn.style.display = 'none';
             
             updateAvailableBeers();
@@ -1475,7 +1493,6 @@
             gameOverOverlay.style.opacity = 1;
             finalScoreText.textContent = `${questions.length} kérdésből ${finalScore} kérdésen jutottál túl pozitív piával.`;
             
-            // Ha még vannak kérdések, akkor megjelenítjük a REFILL gombot
             if (currentQuestion < questions.length - 1) {
                 refillBtn.style.display = 'inline-block';
             } else {
