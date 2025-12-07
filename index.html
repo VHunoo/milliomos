@@ -208,6 +208,15 @@
   .silver { color: silver; }
   .bronze { color: #cd7f32; }
 
+  /* Gombok konténer */
+  .leaderboard-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 15px;
+    flex-wrap: wrap;
+  }
+
   .refresh-btn {
     background: var(--btn-gradient2);
     color: white;
@@ -215,13 +224,31 @@
     padding: 8px 16px;
     border-radius: 8px;
     cursor: pointer;
-    margin-top: 15px;
     font-weight: 600;
     transition: all 0.3s ease;
+    flex: 1;
+    min-width: 120px;
   }
 
-  .refresh-btn:hover {
+  .reset-btn {
+    background: var(--btn-gradient3);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .refresh-btn:hover, .reset-btn:hover {
     transform: scale(1.05);
+  }
+
+  .reset-btn:active {
+    background: linear-gradient(135deg, #ff3d3d, #ff1a1a);
   }
 
   /* Kis képernyőre optimalizálás */
@@ -230,6 +257,12 @@
     .menu-btn { width: 180px; font-size: 18px; padding: 14px 0; }
     .leaderboard { padding: 15px; }
     .leaderboard h2 { font-size: 20px; }
+    .leaderboard-buttons {
+      flex-direction: column;
+    }
+    .refresh-btn, .reset-btn {
+      width: 100%;
+    }
   }
 </style>
 </head>
@@ -254,7 +287,10 @@
     <div id="leaderboard-list">
       <div style="color: white; text-align: center;">Ranglista betöltése...</div>
     </div>
-    <button class="refresh-btn" onclick="loadLeaderboard()">🔄 Frissítés</button>
+    <div class="leaderboard-buttons">
+      <button class="refresh-btn" onclick="loadLeaderboard()">🔄 Frissítés</button>
+      <button class="reset-btn" onclick="resetLeaderboard()">🗑️ Ranglista törlése</button>
+    </div>
   </div>
 </div>
 
@@ -311,6 +347,11 @@
       // Ürítjük a listát
       leaderboardList.innerHTML = '';
       
+      if (playerArray.length === 0) {
+        leaderboardList.innerHTML = '<div style="color: white; text-align: center;">Még senki nem játszott</div>';
+        return;
+      }
+      
       // Hozzáadjuk a játékosokat a listához
       playerArray.forEach((player, index) => {
         const item = document.createElement('div');
@@ -336,6 +377,28 @@
     } catch (error) {
       console.error('Hiba a ranglista betöltése során:', error);
       leaderboardList.innerHTML = '<div style="color: white; text-align: center;">Hiba a ranglista betöltése során</div>';
+    }
+  }
+
+  // Ranglista törlése
+  function resetLeaderboard() {
+    if (confirm('Biztosan törölni szeretnéd a teljes ranglistát?')) {
+      try {
+        // Töröljük a localStorage-ból a ranglista adatokat
+        localStorage.removeItem('gameLeaderboard');
+        
+        // Frissítjük a megjelenítést
+        const leaderboardList = document.getElementById('leaderboard-list');
+        leaderboardList.innerHTML = '<div style="color: white; text-align: center;">Ranglista törölve. Új játék indításával kezdheted újra.</div>';
+        
+        // Visszajelzés a felhasználónak
+        alert('Ranglista sikeresen törölve!');
+        
+        console.log('Ranglista törölve.');
+      } catch (error) {
+        console.error('Hiba a ranglista törlése során:', error);
+        alert('Hiba történt a ranglista törlése során.');
+      }
     }
   }
 
