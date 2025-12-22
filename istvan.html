@@ -3,33 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Legyen Ön is Milliomos</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>NEON ARENA - István</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg1: #071428;
-            --bg2: #0f2b45;
+            --neon-pink: #ff00ff;
+            --neon-blue: #00ffff;
+            --neon-green: #00ff00;
+            --neon-yellow: #ffff00;
+            --neon-purple: #9d00ff;
+            --dark-bg: #0a0a1a;
+            --grid-color: rgba(0, 255, 255, 0.1);
+            --panel-bg: rgba(0, 20, 40, 0.8);
             --accent: #ffd54a;
             --good: #51cf66;
             --bad: #ff6b6b;
         }
 
         * {
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
 
         body {
             min-height: 100vh;
+            background: var(--dark-bg);
+            font-family: 'Exo 2', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: radial-gradient(circle at 20% 30%, #082338 0%, var(--bg1) 80%);
-            position: relative;
-            overflow: hidden;
             padding: 20px;
+            color: white;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Hologram grid háttér */
+        .cyber-grid {
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 50px 50px;
+            background-position: center center;
+            animation: gridMove 20s linear infinite;
+            z-index: 0;
+            transform: perspective(500px) rotateX(60deg);
+        }
+
+        /* Scanning lines */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 50%,
+                rgba(0, 255, 255, 0.03) 51%
+            );
+            background-size: 100% 4px;
+            animation: scan 0.1s linear infinite;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Glitch effect */
+        .glitch-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, 
+                    transparent 49%, 
+                    rgba(255, 0, 255, 0.1) 50%, 
+                    transparent 51%),
+                linear-gradient(
+                    transparent 49%, 
+                    rgba(0, 255, 255, 0.1) 50%, 
+                    transparent 51%
+                );
+            background-size: 10px 10px;
+            opacity: 0.1;
+            z-index: 1;
+            pointer-events: none;
+            animation: glitch 5s infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+            100% { transform: perspective(500px) rotateX(60deg) translateY(50px); }
+        }
+
+        @keyframes scan {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 4px; }
+        }
+
+        @keyframes glitch {
+            0%, 100% { opacity: 0.1; transform: translateX(0); }
+            1% { opacity: 0.15; transform: translateX(-2px); }
+            2% { opacity: 0.2; transform: translateX(2px); }
+            3% { opacity: 0.1; transform: translateX(0); }
+            50% { opacity: 0.05; }
         }
 
         /* Segítség ikonok a bal felső sarokban */
@@ -45,41 +127,73 @@
         .help-icon {
             width: 60px;
             height: 60px;
-            border-radius: 50%;
-            background: var(--bg2);
+            border-radius: 4px;
+            background: var(--panel-bg);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-            border: 2px solid var(--accent);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            border: 2px solid var(--neon-blue);
             position: relative;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: all 0.3s ease;
+            animation: floatIcon 3s ease-in-out infinite;
+        }
+
+        .help-icon:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .help-icon:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+
+        .help-icon:nth-child(3) {
+            animation-delay: 1s;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-10px) rotate(2deg);
+            }
         }
 
         .help-icon:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+            transform: scale(1.15) translateY(-5px) rotate(5deg);
+            box-shadow: 0 0 40px var(--neon-blue), 0 0 60px var(--neon-blue);
+            animation: pulseGlow 0.5s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% {
+                box-shadow: 0 0 40px var(--neon-blue), 0 0 60px var(--neon-blue);
+            }
+            50% {
+                box-shadow: 0 0 60px var(--neon-blue), 0 0 80px var(--neon-blue), 0 0 100px var(--neon-blue);
+            }
         }
 
         .help-icon.disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            border-color: rgba(255, 213, 74, 0.5);
+            border-color: rgba(0, 255, 255, 0.3);
         }
 
         .help-icon.disabled:hover {
             transform: none;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
         }
 
         .help-icon .icon {
             font-size: 24px;
-            color: var(--accent);
+            color: var(--neon-blue);
         }
 
         .help-icon.disabled .icon {
-            color: rgba(255, 213, 74, 0.5);
+            color: rgba(0, 255, 255, 0.5);
         }
 
         .help-icon .close-btn {
@@ -109,31 +223,59 @@
             display: none;
         }
 
-        /* Csillagos háttér */
-        .stars {
-            position: absolute;
+        /* Fő konténer */
+        .cyber-main {
+            position: relative;
+            z-index: 2;
+            background: rgba(10, 10, 30, 0.95);
+            border: 2px solid var(--neon-blue);
+            border-radius: 0;
+            padding: 50px 40px;
             width: 100%;
-            height: 100%;
-            z-index: 0;
-            overflow: hidden;
+            max-width: 1400px;
+            box-shadow: 
+                0 0 60px rgba(0, 255, 255, 0.4),
+                0 0 120px rgba(255, 0, 255, 0.3),
+                inset 0 0 60px rgba(0, 255, 255, 0.2);
+            clip-path: polygon(
+                0 30px, 30px 0, 
+                calc(100% - 30px) 0, 100% 30px,
+                100% calc(100% - 30px), calc(100% - 30px) 100%,
+                30px 100%, 0 calc(100% - 30px)
+            );
+            animation: containerPulse 4s ease-in-out infinite, borderGlow 3s ease-in-out infinite alternate;
         }
 
-        .star {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: white;
-            border-radius: 50%;
-            opacity: 0.7;
-            animation: moveStar linear infinite;
-        }
-
-        @keyframes moveStar {
-            from {
-                transform: translateY(0) translateX(0);
+        @keyframes containerPulse {
+            0%, 100% {
+                box-shadow: 
+                    0 0 60px rgba(0, 255, 255, 0.4),
+                    0 0 120px rgba(255, 0, 255, 0.3),
+                    inset 0 0 60px rgba(0, 255, 255, 0.2);
             }
-            to {
-                transform: translateY(-1000px) translateX(50px);
+            50% {
+                box-shadow: 
+                    0 0 80px rgba(0, 255, 255, 0.6),
+                    0 0 150px rgba(255, 0, 255, 0.5),
+                    inset 0 0 80px rgba(0, 255, 255, 0.3);
+            }
+        }
+
+        @keyframes borderGlow {
+            0% {
+                border-color: var(--neon-blue);
+            }
+            25% {
+                border-color: var(--neon-pink);
+            }
+            50% {
+                border-color: var(--neon-green);
+            }
+            75% {
+                border-color: var(--neon-yellow);
+            }
+            100% {
+                border-color: var(--neon-blue);
             }
         }
 
@@ -143,17 +285,37 @@
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: var(--bg2);
+            background: var(--panel-bg);
             padding: 15px 30px;
-            border-radius: 50px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-            border: 2px solid var(--accent);
+            border-radius: 0;
+            box-shadow: 0 0 30px rgba(255, 255, 0, 0.4);
+            border: 2px solid var(--neon-yellow);
             z-index: 100;
             display: flex;
             align-items: center;
             gap: 15px;
             min-width: 200px;
             justify-content: center;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            animation: counterFloat 3s ease-in-out infinite, counterPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes counterFloat {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            50% {
+                transform: translateX(-50%) translateY(-5px);
+            }
+        }
+
+        @keyframes counterPulse {
+            0%, 100% {
+                box-shadow: 0 0 30px rgba(255, 255, 0, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 50px rgba(255, 255, 0, 0.7), 0 0 70px rgba(255, 255, 0, 0.5);
+            }
         }
 
         .beer-counter-content {
@@ -163,6 +325,7 @@
             font-size: 24px;
             font-weight: 700;
             color: #fff;
+            font-family: 'Orbitron', sans-serif;
         }
 
         .beer-icon {
@@ -185,9 +348,23 @@
         .beer-count {
             font-size: 28px;
             font-weight: 800;
-            color: var(--accent);
+            color: var(--neon-yellow);
             min-width: 40px;
             text-align: center;
+            text-shadow: 0 0 10px var(--neon-yellow);
+            animation: numberPulse 1.5s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        @keyframes numberPulse {
+            0%, 100% {
+                transform: scale(1);
+                text-shadow: 0 0 10px var(--neon-yellow);
+            }
+            50% {
+                transform: scale(1.1);
+                text-shadow: 0 0 20px var(--neon-yellow), 0 0 30px var(--neon-yellow);
+            }
         }
 
         .main-content {
@@ -204,11 +381,11 @@
             z-index: 1;
             flex: 1;
             min-width: 0;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 15px 40px rgba(3, 10, 20, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.04);
+            background: transparent;
+            border-radius: 0;
+            padding: 0;
+            box-shadow: none;
+            border: none;
             animation: fadeIn 1s ease forwards;
         }
 
@@ -233,24 +410,70 @@
         .logo {
             width: 90px;
             height: 90px;
-            border-radius: 15px;
-            background: linear-gradient(135deg, var(--accent), #ffb84d);
+            border-radius: 4px;
+            background: linear-gradient(135deg, var(--neon-yellow), var(--neon-pink));
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 800;
             font-size: 28px;
-            color: #071428;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            color: var(--dark-bg);
+            box-shadow: 0 0 30px rgba(255, 255, 0, 0.5);
             overflow: hidden;
             flex-shrink: 0;
+            border: 2px solid var(--neon-yellow);
+            animation: logoRotate 8s linear infinite, logoGlow 2s ease-in-out infinite;
+            position: relative;
+        }
+
+        .logo::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.3) 50%,
+                transparent 70%
+            );
+            animation: logoShine 3s linear infinite;
+        }
+
+        @keyframes logoRotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes logoGlow {
+            0%, 100% {
+                box-shadow: 0 0 30px rgba(255, 255, 0, 0.5), 0 0 50px rgba(255, 0, 255, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 50px rgba(255, 255, 0, 0.8), 0 0 70px rgba(255, 0, 255, 0.6);
+            }
+        }
+
+        @keyframes logoShine {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .logo img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 15px;
+            border-radius: 4px;
         }
 
         .header-text {
@@ -261,6 +484,27 @@
             font-size: 28px;
             margin: 0;
             color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px var(--neon-pink);
+            animation: titleGlow 3s ease-in-out infinite;
+            position: relative;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% {
+                text-shadow: 0 0 15px var(--neon-pink), 0 0 25px var(--neon-pink);
+            }
+            25% {
+                text-shadow: 0 0 20px var(--neon-blue), 0 0 30px var(--neon-blue);
+            }
+            50% {
+                text-shadow: 0 0 20px var(--neon-green), 0 0 30px var(--neon-green);
+            }
+            75% {
+                text-shadow: 0 0 20px var(--neon-yellow), 0 0 30px var(--neon-yellow);
+            }
         }
 
         .meta {
@@ -271,16 +515,57 @@
         }
 
         .question-container {
-            background: var(--bg2);
+            background: var(--panel-bg);
             padding: 40px;
-            border-radius: 18px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            border-radius: 0;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+            border: 2px solid var(--neon-blue);
             margin-bottom: 30px;
             min-height: 180px;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            position: relative;
+            animation: questionGlow 3s ease-in-out infinite;
+            overflow: hidden;
+        }
+
+        .question-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(0, 255, 255, 0.1) 50%,
+                transparent 70%
+            );
+            animation: questionScan 4s linear infinite;
+        }
+
+        @keyframes questionGlow {
+            0%, 100% {
+                box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+                border-color: var(--neon-blue);
+            }
+            50% {
+                box-shadow: 0 0 50px rgba(0, 255, 255, 0.6), 0 0 70px rgba(255, 0, 255, 0.4);
+                border-color: var(--neon-pink);
+            }
+        }
+
+        @keyframes questionScan {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .question {
@@ -288,6 +573,39 @@
             color: #fff;
             font-weight: 600;
             line-height: 1.4;
+            font-family: 'Exo 2', sans-serif;
+            position: relative;
+            animation: questionText 2s ease-in-out infinite;
+        }
+
+        /* Typing effect styles */
+        .question .typed {
+            color: #fff;
+            white-space: pre-wrap;
+            word-break: break-word;
+            display: inline;
+            font-family: 'Exo 2', sans-serif;
+            text-shadow: 0 0 8px rgba(0,255,255,0.06);
+        }
+
+        .question .caret {
+            display: inline-block;
+            margin-left: 6px;
+            color: var(--neon-blue);
+            font-weight: 800;
+            animation: caretBlink 0.7s steps(1) infinite;
+            text-shadow: 0 0 12px var(--neon-blue);
+        }
+
+       
+
+        @keyframes questionText {
+            0%, 100% {
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            }
+            50% {
+                text-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 0 0 30px rgba(0, 255, 255, 0.5);
+            }
         }
 
         .answers {
@@ -298,24 +616,95 @@
         }
 
         .ans-btn {
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(0, 0, 0, 0.06));
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: var(--panel-bg);
+            border: 2px solid var(--neon-blue);
             padding: 25px;
-            border-radius: 15px;
+            border-radius: 0;
             cursor: pointer;
             display: flex;
             gap: 20px;
             align-items: center;
             font-weight: 600;
-            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
             min-height: 100px;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            animation: buttonIdle 4s ease-in-out infinite;
+        }
+
+        .ans-btn:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .ans-btn:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+
+        .ans-btn:nth-child(3) {
+            animation-delay: 1s;
+        }
+
+        .ans-btn:nth-child(4) {
+            animation-delay: 1.5s;
+        }
+
+        @keyframes buttonIdle {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+            }
+        }
+
+        .ans-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .ans-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.3), transparent);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+            border-radius: 50%;
         }
 
         .ans-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 0 40px var(--neon-blue), 0 0 60px var(--neon-blue);
+            border-color: var(--neon-blue);
+            animation: buttonHover 0.5s ease-in-out infinite;
+        }
+
+        @keyframes buttonHover {
+            0%, 100% {
+                box-shadow: 0 0 40px var(--neon-blue), 0 0 60px var(--neon-blue);
+            }
+            50% {
+                box-shadow: 0 0 60px var(--neon-blue), 0 0 80px var(--neon-blue), 0 0 100px var(--neon-blue);
+            }
+        }
+
+        .ans-btn:hover::before {
+            left: 100%;
+        }
+
+        .ans-btn:hover::after {
+            width: 200px;
+            height: 200px;
         }
 
         .ans-btn:active {
@@ -331,34 +720,78 @@
             display: none;
         }
 
+        .ans-btn.correct {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 30px var(--neon-green);
+            background: rgba(0, 255, 0, 0.1);
+        }
+
+        .ans-btn.wrong {
+            border-color: var(--bad);
+            box-shadow: 0 0 30px var(--bad);
+            background: rgba(255, 107, 107, 0.1);
+        }
+
         .ans-btn .text {
             color: #ffffff;
             flex: 1;
             font-size: 20px;
+            font-family: 'Exo 2', sans-serif;
         }
 
         .letter {
             width: 50px;
             height: 50px;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid var(--neon-blue);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            color: #fff;
+            color: var(--neon-blue);
             font-size: 20px;
             flex-shrink: 0;
             position: relative;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 10px var(--neon-blue);
+            animation: letterPulse 2s ease-in-out infinite;
+            transition: all 0.3s ease;
+        }
+
+        @keyframes letterPulse {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 0 0 30px rgba(0, 255, 255, 0.5);
+            }
+        }
+
+        .ans-btn:hover .letter {
+            animation: letterRotate 0.5s ease-in-out, letterPulse 1s ease-in-out infinite;
+            transform: rotate(5deg) scale(1.1);
+        }
+
+        @keyframes letterRotate {
+            0% {
+                transform: rotate(0deg) scale(1);
+            }
+            50% {
+                transform: rotate(10deg) scale(1.15);
+            }
+            100% {
+                transform: rotate(5deg) scale(1.1);
+            }
         }
 
         .beer-badge {
             position: absolute;
             top: -8px;
             right: -8px;
-            background: var(--accent);
-            color: #071428;
-            border-radius: 50%;
+            background: var(--neon-yellow);
+            color: var(--dark-bg);
+            border-radius: 4px;
             width: 24px;
             height: 24px;
             display: flex;
@@ -366,8 +799,10 @@
             justify-content: center;
             font-size: 14px;
             font-weight: 800;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 0 15px var(--neon-yellow);
             animation: popIn 0.3s ease-out;
+            border: 1px solid var(--neon-yellow);
+            font-family: 'Orbitron', sans-serif;
         }
 
         .cups {
@@ -408,21 +843,86 @@
             margin-top: 25px;
             min-height: 35px;
             font-size: 18px;
-            color: #ffd54a;
+            color: var(--neon-yellow);
             text-align: center;
             padding: 15px;
-            background: rgba(255, 213, 74, 0.1);
-            border-radius: 10px;
+            background: rgba(255, 255, 0, 0.1);
+            border-radius: 0;
+            border: 1px solid var(--neon-yellow);
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            font-family: 'Exo 2', sans-serif;
+            animation: feedbackPulse 2s ease-in-out infinite;
+            position: relative;
+            overflow: hidden;
         }
 
-        .correct {
-            background: linear-gradient(90deg, rgba(81, 207, 102, 0.15), rgba(81, 207, 102, 0.06));
-            border: 1px solid rgba(81, 207, 102, 0.18);
+        .feedback::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 0, 0.3), transparent);
+            animation: feedbackScan 3s linear infinite;
         }
 
-        .wrong {
-            background: linear-gradient(90deg, rgba(255, 107, 107, 0.12), rgba(255, 107, 107, 0.04));
-            border: 1px solid rgba(255, 107, 107, 0.14);
+        @keyframes feedbackPulse {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(255, 255, 0, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(255, 255, 0, 0.6);
+            }
+        }
+
+        @keyframes feedbackScan {
+            0% {
+                left: -100%;
+            }
+            100% {
+                left: 100%;
+            }
+        }
+
+        .feedback.correct {
+            background: rgba(0, 255, 0, 0.1);
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            animation: feedbackCorrect 1s ease-in-out infinite;
+        }
+
+        @keyframes feedbackCorrect {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(0, 255, 0, 0.6), 0 0 60px rgba(0, 255, 0, 0.4);
+                transform: scale(1.02);
+            }
+        }
+
+        .feedback.wrong {
+            background: rgba(255, 107, 107, 0.1);
+            border-color: var(--bad);
+            color: var(--bad);
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
+            animation: feedbackWrong 0.5s ease-in-out infinite;
+        }
+
+        @keyframes feedbackWrong {
+            0%, 100% {
+                transform: translateX(0);
+                box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
+            }
+            25% {
+                transform: translateX(-5px);
+            }
+            75% {
+                transform: translateX(5px);
+            }
         }
 
         .controls {
@@ -439,29 +939,81 @@
         }
 
         button.control {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(0, 0, 0, 0.1));
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: transparent;
+            border: 2px solid var(--neon-blue);
             padding: 15px 25px;
-            border-radius: 10px;
-            color: #cfe9ff;
+            border-radius: 0;
+            color: var(--neon-blue);
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             font-weight: 600;
             font-size: 16px;
+            font-family: 'Exo 2', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+
+        button.control::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        button.control:hover::before {
+            width: 300px;
+            height: 300px;
         }
 
         button.control:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: scale(1.05);
+            box-shadow: 0 0 30px var(--neon-blue), 0 0 50px var(--neon-blue);
+            transform: translateY(-3px) scale(1.05);
+            animation: controlHover 0.6s ease-in-out infinite;
+        }
+
+        @keyframes controlHover {
+            0%, 100% {
+                box-shadow: 0 0 30px var(--neon-blue), 0 0 50px var(--neon-blue);
+            }
+            50% {
+                box-shadow: 0 0 40px var(--neon-blue), 0 0 60px var(--neon-blue), 0 0 80px var(--neon-blue);
+            }
         }
 
         button.control:active {
-            transform: scale(0.95);
+            transform: translateY(1px) scale(0.98);
+            animation: controlClick 0.2s ease;
+        }
+
+        @keyframes controlClick {
+            0% {
+                transform: translateY(1px) scale(0.98);
+            }
+            50% {
+                transform: translateY(1px) scale(0.95);
+            }
+            100% {
+                transform: translateY(1px) scale(0.98);
+            }
         }
 
         button.control.primary {
-            background: linear-gradient(135deg, var(--accent), #ffb84d);
-            color: #071428;
+            background: transparent;
+            border-color: var(--neon-yellow);
+            color: var(--neon-yellow);
+        }
+
+        button.control.primary:hover {
+            box-shadow: 0 0 20px var(--neon-yellow);
         }
 
         button.control.disabled {
@@ -480,21 +1032,23 @@
             flex-direction: column;
             align-items: center;
             padding: 25px 15px;
-            background: var(--bg2);
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--panel-bg);
+            border-radius: 0;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+            border: 2px solid var(--neon-blue);
             z-index: 10;
             max-height: 80vh;
             overflow-y: auto;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
         }
 
         .ladder-step {
             width: 100%;
             padding: 15px;
             margin: 6px 0;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 255, 0.2);
             color: #fff;
             font-weight: 600;
             text-align: center;
@@ -503,17 +1057,42 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            font-family: 'Exo 2', sans-serif;
+            animation: stepIdle 3s ease-in-out infinite;
+        }
+
+        @keyframes stepIdle {
+            0%, 100% {
+                opacity: 0.8;
+            }
+            50% {
+                opacity: 1;
+            }
         }
 
         .ladder-step.current {
-            background: rgba(255, 213, 74, 0.2);
-            border: 1px solid var(--accent);
+            background: rgba(255, 255, 0, 0.2);
+            border: 2px solid var(--neon-yellow);
             transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 255, 0, 0.4);
+            animation: stepCurrent 1.5s ease-in-out infinite;
+        }
+
+        @keyframes stepCurrent {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(255, 255, 0, 0.4);
+                transform: scale(1.05);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(255, 255, 0, 0.7), 0 0 60px rgba(255, 255, 0, 0.5);
+                transform: scale(1.08);
+            }
         }
 
         .ladder-step.correct {
-            background: rgba(81, 207, 102, 0.2);
-            border: 1px solid var(--good);
+            background: rgba(0, 255, 0, 0.2);
+            border: 2px solid var(--neon-green);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
         }
 
         .ladder-step-number {
@@ -528,8 +1107,9 @@
         .ladder-step-indicator {
             width: 22px;
             height: 22px;
-            border-radius: 50%;
+            border-radius: 4px;
             background: rgba(255, 255, 255, 0.2);
+            border: 1px solid var(--neon-blue);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -537,11 +1117,13 @@
         }
 
         .ladder-step.correct .ladder-step-indicator {
-            background: var(--good);
+            background: var(--neon-green);
+            border-color: var(--neon-green);
         }
 
         .ladder-step.current .ladder-step-indicator {
-            background: var(--accent);
+            background: var(--neon-yellow);
+            border-color: var(--neon-yellow);
         }
 
         /* Overlay-ek */
@@ -557,36 +1139,44 @@
             justify-content: center;
             color: #fff;
             z-index: 9999;
-            font-family: 'Inter';
+            font-family: 'Exo 2', sans-serif;
         }
 
         #start-overlay {
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(10, 10, 26, 0.95);
         }
 
         #start-overlay h2 {
             font-size: 32px;
             margin-bottom: 20px;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px var(--neon-pink);
         }
 
         #start-overlay button {
             padding: 12px 24px;
             font-size: 18px;
-            border: none;
-            border-radius: 8px;
-            background: var(--accent);
-            color: #071428;
+            border: 2px solid var(--neon-yellow);
+            border-radius: 0;
+            background: transparent;
+            color: var(--neon-yellow);
             font-weight: bold;
             cursor: pointer;
-            transition: transform 0.2s ease;
+            transition: all 0.3s ease;
+            font-family: 'Exo 2', sans-serif;
+            text-transform: uppercase;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
         }
 
         #start-overlay button:hover {
             transform: scale(1.05);
+            box-shadow: 0 0 20px var(--neon-yellow);
         }
 
         .game-over-overlay {
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(10, 10, 26, 0.95);
             display: none;
             opacity: 0;
             transition: opacity 0.5s ease;
@@ -595,7 +1185,7 @@
         }
 
         .win-overlay {
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(10, 10, 26, 0.95);
             display: none;
             opacity: 0;
             transition: opacity 0.5s ease;
@@ -604,9 +1194,9 @@
         }
 
         .game-over-box, .win-box {
-            background: var(--bg2);
-            border: 2px solid var(--accent);
-            border-radius: 16px;
+            background: var(--panel-bg);
+            border: 2px solid var(--neon-yellow);
+            border-radius: 0;
             padding: 40px;
             text-align: center;
             color: #fff;
@@ -614,28 +1204,36 @@
             transition: transform 0.5s ease;
             max-width: 500px;
             width: 90%;
+            clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
+            box-shadow: 0 0 40px rgba(255, 255, 0, 0.4);
         }
 
         .win-box {
-            border: 2px solid var(--good);
-            background: linear-gradient(135deg, var(--bg2), rgba(81, 207, 102, 0.1));
+            border: 2px solid var(--neon-green);
+            background: var(--panel-bg);
+            box-shadow: 0 0 40px rgba(0, 255, 0, 0.4);
         }
 
         .game-over-box h2, .win-box h2 {
             margin-bottom: 16px;
             font-size: 28px;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         .win-box h2 {
-            color: var(--good);
+            color: var(--neon-green);
             font-size: 36px;
             margin-bottom: 20px;
+            text-shadow: 0 0 20px var(--neon-green);
         }
 
         .game-over-box p, .win-box p {
             margin-bottom: 20px;
             font-size: 18px;
             line-height: 1.5;
+            font-family: 'Exo 2', sans-serif;
         }
 
         .win-box p {
@@ -645,24 +1243,28 @@
 
         .game-over-box button, .win-box button {
             padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            background: var(--accent);
-            color: #071428;
+            border: 2px solid var(--neon-yellow);
+            border-radius: 0;
+            background: transparent;
+            color: var(--neon-yellow);
             font-weight: bold;
             cursor: pointer;
-            transition: transform 0.2s ease;
+            transition: all 0.3s ease;
             font-size: 16px;
             margin: 5px;
+            font-family: 'Exo 2', sans-serif;
+            text-transform: uppercase;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
         }
 
         .win-box button {
-            background: var(--good);
-            color: #fff;
+            border-color: var(--neon-green);
+            color: var(--neon-green);
         }
 
         .game-over-box button:hover, .win-box button:hover {
             transform: scale(1.05);
+            box-shadow: 0 0 20px currentColor;
         }
 
         .button-group {
@@ -676,7 +1278,7 @@
             position: fixed;
             width: 15px;
             height: 15px;
-            background: var(--accent);
+            background: var(--neon-yellow);
             opacity: 0;
             z-index: 9998;
         }
@@ -735,20 +1337,24 @@
 
         /* Refill gomb stílus */
         .refill-btn {
-            background: linear-gradient(135deg, #4dabf7, #339af0);
-            color: white;
-            border: none;
+            background: transparent;
+            color: var(--neon-blue);
+            border: 2px solid var(--neon-blue);
             padding: 12px 24px;
-            border-radius: 8px;
+            border-radius: 0;
             font-weight: bold;
             cursor: pointer;
-            transition: transform 0.2s ease;
+            transition: all 0.3s ease;
             font-size: 16px;
             margin: 5px;
+            font-family: 'Exo 2', sans-serif;
+            text-transform: uppercase;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
         }
 
         .refill-btn:hover {
             transform: scale(1.05);
+            box-shadow: 0 0 20px var(--neon-blue);
         }
 
         /* Reszponzív design */
@@ -909,19 +1515,24 @@
     </style>
 </head>
 <body>
+    <!-- Cyberpunk háttér elemek -->
+    <div class="cyber-grid"></div>
+    <div class="scanlines"></div>
+    <div class="glitch-overlay"></div>
+
     <!-- Segítség ikonok a bal felső sarokban -->
     <div class="help-icons">
         <div class="help-icon" id="help-1">
             <div class="icon">½</div>
-            <div class="close-btn">X</div>
+            <div class="close-btn"></div>
         </div>
         <div class="help-icon" id="help-2">
             <div class="icon">📞</div>
-            <div class="close-btn">X</div>
+            <div class="close-btn"></div>
         </div>
         <div class="help-icon" id="help-3">
             <div class="icon">👥</div>
-            <div class="close-btn">X</div>
+            <div class="close-btn"></div>
         </div>
     </div>
 
@@ -934,10 +1545,10 @@
         </div>
     </div>
 
-    <div class="stars"></div>
-
-    <div class="main-content">
-        <div class="container">
+    <!-- Fő tartalom -->
+    <div class="cyber-main">
+        <div class="main-content">
+            <div class="container">
             <header>
                 <div class="logo">
                     <!-- Ide jön a kép - cseréld le a kívánt képre -->
@@ -986,6 +1597,7 @@
             </div>
         </div>
     </div>
+    </div>
     
     <!-- Lépcsős megjelenítés a képernyő jobb szélén -->
     <div class="progress-ladder" id="progressLadder">
@@ -1004,7 +1616,7 @@
             <div class="button-group">
                 <button id="restartBtn">Új játék</button>
                 <button id="backToHomeBtn">Vissza a főoldalra</button>
-                <button class="refill-btn" id="refillBtn" style="display:none">REFILL (+5 pia)</button>
+                <button class="refill-btn" id="refillBtn" style="display:none">REFILL (+10 pia)</button>
             </div>
         </div>
     </div>
@@ -1023,19 +1635,6 @@
     </div>
 
     <script>
-        // Csillagok generálása
-        const starsContainer = document.querySelector('.stars');
-        for (let i = 0; i < 100; i++) {
-            const s = document.createElement('div');
-            s.className = 'star';
-            s.style.top = Math.random() * window.innerHeight + 'px';
-            s.style.left = Math.random() * window.innerWidth + 'px';
-            s.style.width = (Math.random() * 2 + 1) + 'px';
-            s.style.height = s.style.width;
-            s.style.animationDuration = (Math.random() * 30 + 20) + 's';
-            starsContainer.appendChild(s);
-        }
-
         // Segítség ikonok kezelése
         const helpIcons = document.querySelectorAll('.help-icon');
         let helpUsed = {
@@ -1099,76 +1698,108 @@
             fEl.textContent = `✅ Felező segítség: Eltávolítottunk két rossz választ!`;
         }
 
-// PROGRESS MENTÉS FUNKCIÓ - JAVÍTOTT
-function savePlayerProgress(playerName) {
-    try {
-        const currentLeaderboard = JSON.parse(localStorage.getItem('gameLeaderboard') || '{}');
-        
-        // Csak akkor mentjük a progress-t, ha a játékos sikeresen teljesítette a kérdést
-        // Vagyis ha pozitív piája maradt a kérdés után
-        if (availablePoints > 0) {
-            let actualProgress = currentQuestion + 1;
-            
-            // Ha nyertünk (minden kérdés helyes), akkor 5. kérdés
-            if (checkIfAllCorrect()) {
-                actualProgress = 5;
-            }
-            // Ha az utolsó kérdésnél vagyunk és még nem nyertünk, de helyes a válasz
-            else if (currentQuestion === 4 && availablePoints > 0) {
-                actualProgress = 5;
-            }
-            // Egyébként csak a jelenlegi kérdés száma
-            else {
-                actualProgress = Math.min(currentQuestion + 1, 5);
-            }
-            
-            // Csak akkor mentjük, ha ez magasabb progress, mint az előző
-            const currentProgress = currentLeaderboard[playerName]?.progress || 0;
-            if (actualProgress > currentProgress) {
-                currentLeaderboard[playerName] = { 
-                    name: playerName.charAt(0).toUpperCase() + playerName.slice(1), 
-                    progress: actualProgress 
-                };
+        // PROGRESS MENTÉS FUNKCIÓ - JAVÍTOTT (10 kérdés)
+        function savePlayerProgress(playerName) {
+            try {
+                const currentLeaderboard = JSON.parse(localStorage.getItem('gameLeaderboard') || '{}');
                 
-                localStorage.setItem('gameLeaderboard', JSON.stringify(currentLeaderboard));
-                console.log(`${playerName} progress mentve: ${actualProgress}. kérdés`);
+                // Csak akkor mentjük a progress-t, ha a játékos sikeresen teljesítette a kérdést
+                // Vagyis ha pozitív piája maradt a kérdés után
+                if (availablePoints > 0) {
+                    let actualProgress = currentQuestion + 1;
+                    
+                    // Ha nyertünk (minden kérdés helyes), akkor 10. kérdés
+                    if (checkIfAllCorrect()) {
+                        actualProgress = 10;
+                    }
+                    // Ha az utolsó kérdésnél vagyunk és még nem nyertünk, de helyes a válasz
+                    else if (currentQuestion === 9 && availablePoints > 0) {
+                        actualProgress = 10;
+                    }
+                    // Egyébként csak a jelenlegi kérdés száma
+                    else {
+                        actualProgress = Math.min(currentQuestion + 1, 10);
+                    }
+                    
+                    // Csak akkor mentjük, ha ez magasabb progress, mint az előző
+                    const currentProgress = currentLeaderboard[playerName]?.progress || 0;
+                    if (actualProgress > currentProgress) {
+                        // Külön kezeljük az István nevet, hogy ékezetes legyen
+                        let displayName = playerName.charAt(0).toUpperCase() + playerName.slice(1);
+                        if (playerName === 'istvan') {
+                            displayName = 'István';
+                        }
+                        
+                        currentLeaderboard[playerName] = { 
+                            name: displayName, 
+                            progress: actualProgress 
+                        };
+                        
+                        localStorage.setItem('gameLeaderboard', JSON.stringify(currentLeaderboard));
+                        console.log(`${playerName} progress mentve: ${actualProgress}. kérdés`);
+                    }
+                } else {
+                    // Ha nincs piája, akkor nem mentjük a progress-t
+                    console.log(`${playerName} nem teljesítette a ${currentQuestion + 1}. kérdést, progress nem mentve`);
+                }
+            } catch (e) {
+                console.error('Hiba a progress mentése során:', e);
             }
-        } else {
-            // Ha nincs piája, akkor nem mentjük a progress-t
-            console.log(`${playerName} nem teljesítette a ${currentQuestion + 1}. kérdést, progress nem mentve`);
         }
-    } catch (e) {
-        console.error('Hiba a progress mentése során:', e);
-    }
-}
+
         // Játékállapot
         const START_POINTS = 10;
         const questions = [
             {
-                q: 'A naprendszer tömegének hány százalékát teszi ki a nap?',
-                options: ['64,3%', '92,3%', '99,8%', '78,5%'],
-                correctIndex: 2
-            },
-            {
-                q: 'Melyik bolygó a legnagyobb a Naprendszerben?',
-                options: ['Föld', 'Mars', 'Jupiter', 'Szaturnusz'],
-                correctIndex: 2
-            },
-            {
-                q: 'Hány holdja van a Földnek?',
-                options: ['0', '1', '2', '3'],
+                q: 'Kivel készült a "Titokzatos idegen" youtube videó?',
+                options: ['Szabó Milán', 'Patrik', 'Balázs', 'Hunor'],
                 correctIndex: 1
             },
             {
-                q: 'Melyik bolygót nevezik "Vörös Bolygónak"?',
-                options: ['Vénusz', 'Mars', 'Jupiter', 'Merkúr'],
+                q: 'Mit mondott István Balázsnak a budiba?',
+                options: ['csattogtasd még', 'csattogtasd már', 'csattogtasd', 'helikopterezz'],
                 correctIndex: 1
             },
             {
-                q: 'Melyik bolygó forog ellentétes irányba, mint a legtöbb másik?',
-                options: ['Vénusz', 'Mars', 'Uránusz', 'Neptunusz'],
+                q: 'Mi Hunor fc 25 player karrierjének a neve?',
+                options: ['Tengeri Robertson', 'Kalóz Róbert', 'Tengerész Robertson', 'Tengerész Robert'],
+                correctIndex: 2
+            },
+            {
+                q: 'Mi a neve annak a starter pack skinnek ami csak neked van meg?',
+                options: ['Summit striker', 'Wingman', 'Seeker', 'The Ace'],
+                correctIndex: 3
+            },
+            {
+                q: 'Milyen skint ölt meg a híres "ennyi vagy ennyi" kilpben Gyula (Huniyolo montage)?',
+                options: ['Focista', 'Skull Trooper', 'Ghoul Trooper', 'Lynx'],
+                correctIndex: 1
+            },            
+            {
+                q: 'Mivel lett vágva az első Isti Yolo montage?',
+                options: ['Inshot', 'Mobizen', 'Capcut', 'KineMaster'],
                 correctIndex: 0
-            }
+            },
+            {
+                q: 'Melyik volt Drake első albuma?',
+                options: ['Thank Me Later', 'So Far Gone', 'Nothing Was The Same', 'What A Time To Be Alive'],
+                correctIndex: 1
+            },
+            {
+                q: 'Mikor született Pál Vitya?',
+                options: ['2009. Május 20.', '2008. Július 7.', '2008. Május 20.', '2008. Március 15.'],
+                correctIndex: 3
+            },
+            {
+                q: 'Hányadik században században jelent meg először a "minden út Rómába vezet" mondás?',
+                options: ['XIV.', 'XII.', 'IX.', 'IV.'],
+                correctIndex: 1
+            },
+            {
+                q: 'Hol játszik Vinícius?',
+                options: ['BVSC Zugló', 'Real Madrid', 'Ferencvárosi TC', 'THSE-Szabadkikötő'],
+                correctIndex: 0
+            },
         ];
 
         let currentQuestion = 0;
@@ -1203,7 +1834,7 @@ function savePlayerProgress(playerName) {
 
         // Refill funkció
         function useRefill() {
-            availablePoints += 5;
+            availablePoints += 10;
             updateAvailableBeers();
             refillBtn.style.display = 'none';
             document.body.classList.remove('game-over-flash');
@@ -1229,7 +1860,7 @@ function savePlayerProgress(playerName) {
 
         // Konfetti effekt
         function createConfetti() {
-            const colors = ['#ffd54a', '#51cf66', '#ff6b6b', '#4dabf7', '#da77f2'];
+            const colors = ['#ffff00', '#00ff00', '#ff00ff', '#00ffff', '#9d00ff'];
             const confettiCount = 150;
             
             for (let i = 0; i < confettiCount; i++) {
@@ -1277,6 +1908,11 @@ function savePlayerProgress(playerName) {
         // Elérhető piák frissítése
         function updateAvailableBeers() {
             availableBeersEl.textContent = availablePoints;
+            // Animate beer counter when value changes
+            availableBeersEl.style.animation = 'none';
+            setTimeout(() => {
+                availableBeersEl.style.animation = 'numberPulse 0.5s ease-in-out';
+            }, 10);
         }
 
         // Lépcsős megjelenítés inicializálása
@@ -1333,10 +1969,41 @@ function savePlayerProgress(playerName) {
         }
 
         // Kérdés megjelenítése
+        // Typing helper: types text into the question element with a caret
+        let typingTimer = null;
+        function typeQuestion(text, speed = 18) {
+            if (typingTimer) {
+                clearTimeout(typingTimer);
+                typingTimer = null;
+            }
+            // prepare elements
+            qEl.innerHTML = '<span class="typed"></span><span class="caret">|</span>';
+            const typedEl = qEl.querySelector('.typed');
+            const caretEl = qEl.querySelector('.caret');
+            let i = 0;
+
+            function step() {
+                if (i <= text.length) {
+                    typedEl.textContent = text.slice(0, i);
+                    i++;
+                    // small random jitter to feel more 'fast-typed'
+                    typingTimer = setTimeout(step, speed + Math.random() * 6);
+                } else {
+                    // finished typing -> fade out caret
+                    caretEl.style.transition = 'opacity 200ms';
+                    caretEl.style.opacity = '0';
+                    typingTimer = null;
+                }
+            }
+
+            step();
+        }
+
         function renderQuestion() {
             if (gameOver) return;
             const item = questions[currentQuestion];
-            qEl.textContent = item.q;
+            // type the question instead of setting it instantly
+            typeQuestion(item.q);
             aEl.innerHTML = '';
             fEl.textContent = '';
             currentBets = [0, 0, 0, 0];
@@ -1515,6 +2182,118 @@ function savePlayerProgress(playerName) {
             initProgressLadder();
             renderQuestion();
         };
+
+        // Particle effect function
+        function createParticles(x, y, color) {
+            const particleCount = 15;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.style.position = 'fixed';
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.width = '4px';
+                particle.style.height = '4px';
+                particle.style.background = color;
+                particle.style.borderRadius = '50%';
+                particle.style.pointerEvents = 'none';
+                particle.style.zIndex = '9999';
+                particle.style.boxShadow = `0 0 10px ${color}`;
+                document.body.appendChild(particle);
+                
+                const angle = (Math.PI * 2 * i) / particleCount;
+                const velocity = 2 + Math.random() * 3;
+                const vx = Math.cos(angle) * velocity;
+                const vy = Math.sin(angle) * velocity;
+                
+                particle.animate([
+                    {
+                        transform: 'translate(0, 0) scale(1)',
+                        opacity: 1
+                    },
+                    {
+                        transform: `translate(${vx * 50}px, ${vy * 50}px) scale(0)`,
+                        opacity: 0
+                    }
+                ], {
+                    duration: 800 + Math.random() * 400,
+                    easing: 'ease-out'
+                }).onfinish = () => particle.remove();
+            }
+        }
+
+        // Enhanced button click effects
+        document.querySelectorAll('.ans-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const rect = this.getBoundingClientRect();
+                createParticles(
+                    rect.left + rect.width / 2,
+                    rect.top + rect.height / 2,
+                    'var(--neon-blue)'
+                );
+            });
+        });
+
+        document.querySelectorAll('button.control').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const rect = this.getBoundingClientRect();
+                createParticles(
+                    rect.left + rect.width / 2,
+                    rect.top + rect.height / 2,
+                    'var(--neon-blue)'
+                );
+            });
+        });
+
+        // Add ripple effect to answer buttons
+        function addRippleEffect(element, color) {
+            element.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.style.position = 'absolute';
+                ripple.style.borderRadius = '50%';
+                ripple.style.background = color;
+                ripple.style.opacity = '0.5';
+                ripple.style.transform = 'scale(0)';
+                ripple.style.animation = 'ripple 0.6s ease-out';
+                ripple.style.pointerEvents = 'none';
+                
+                this.style.position = 'relative';
+                this.style.overflow = 'hidden';
+                this.appendChild(ripple);
+                
+                setTimeout(() => ripple.remove(), 600);
+            });
+        }
+
+        // Add ripple animation keyframe
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Enhanced hover effects for answer buttons
+        document.querySelectorAll('.ans-btn').forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                this.style.animation = 'buttonHover 0.5s ease-in-out infinite';
+            });
+            
+            btn.addEventListener('mouseleave', function() {
+                this.style.animation = 'buttonIdle 4s ease-in-out infinite';
+            });
+        });
 
         // Kezdeti kérdés betöltése
         updateAvailableBeers();
