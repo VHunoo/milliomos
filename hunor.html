@@ -1,0 +1,2306 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEON ARENA - Hunor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-pink: #ff00ff;
+            --neon-blue: #00ffff;
+            --neon-green: #00ff00;
+            --neon-yellow: #ffff00;
+            --neon-purple: #9d00ff;
+            --neon-orange: #FF5C00;
+            --dark-bg: #0a0a1a;
+            --grid-color: rgba(0, 255, 255, 0.1);
+            --panel-bg: rgba(0, 20, 40, 0.8);
+            --accent: #ffd54a;
+            --good: #51cf66;
+            --bad: #ff6b6b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--dark-bg);
+            font-family: 'Exo 2', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: white;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Hologram grid háttér */
+        .cyber-grid {
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 50px 50px;
+            background-position: center center;
+            animation: gridMove 20s linear infinite;
+            z-index: 0;
+            transform: perspective(500px) rotateX(60deg);
+        }
+
+        /* Scanning lines */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 50%,
+                rgba(0, 255, 255, 0.03) 51%
+            );
+            background-size: 100% 4px;
+            animation: scan 0.1s linear infinite;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Glitch effect */
+        .glitch-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, 
+                    transparent 49%, 
+                    rgba(255, 0, 255, 0.1) 50%, 
+                    transparent 51%),
+                linear-gradient(
+                    transparent 49%, 
+                    rgba(0, 255, 255, 0.1) 50%, 
+                    transparent 51%
+                );
+            background-size: 10px 10px;
+            opacity: 0.1;
+            z-index: 1;
+            pointer-events: none;
+            animation: glitch 5s infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+            100% { transform: perspective(500px) rotateX(60deg) translateY(50px); }
+        }
+
+        @keyframes scan {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 4px; }
+        }
+
+        @keyframes glitch {
+            0%, 100% { opacity: 0.1; transform: translateX(0); }
+            1% { opacity: 0.15; transform: translateX(-2px); }
+            2% { opacity: 0.2; transform: translateX(2px); }
+            3% { opacity: 0.1; transform: translateX(0); }
+            50% { opacity: 0.05; }
+        }
+
+        /* Segítség ikonok a bal felső sarokban */
+        .help-icons {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .help-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 4px;
+            background: var(--panel-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            border: 2px solid var(--neon-blue);
+            position: relative;
+            transition: all 0.3s ease;
+            animation: floatIcon 3s ease-in-out infinite;
+        }
+
+        .help-icon:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .help-icon:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+
+        .help-icon:nth-child(3) {
+            animation-delay: 1s;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-10px) rotate(2deg);
+            }
+        }
+
+        .help-icon:hover {
+            transform: scale(1.15) translateY(-5px) rotate(5deg);
+            box-shadow: 0 0 40px var(--neon-blue), 0 0 60px var(--neon-blue);
+            animation: pulseGlow 0.5s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% {
+                box-shadow: 0 0 40px var(--neon-blue), 0 0 60px var(--neon-blue);
+            }
+            50% {
+                box-shadow: 0 0 60px var(--neon-blue), 0 0 80px var(--neon-blue), 0 0 100px var(--neon-blue);
+            }
+        }
+
+        .help-icon.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-color: rgba(0, 255, 255, 0.3);
+        }
+
+        .help-icon.disabled:hover {
+            transform: none;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .help-icon .icon {
+            font-size: 24px;
+            color: var(--neon-blue);
+        }
+
+        .help-icon.disabled .icon {
+            color: rgba(0, 255, 255, 0.5);
+        }
+
+        .help-icon .close-btn {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--bad);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .help-icon:hover .close-btn {
+            opacity: 1;
+        }
+
+        .help-icon.disabled .close-btn {
+            display: none;
+        }
+
+        /* Fő konténer */
+        .cyber-main {
+            position: relative;
+            z-index: 2;
+            background: rgba(10, 10, 30, 0.95);
+            border: 2px solid var(--neon-blue);
+            border-radius: 0;
+            padding: 50px 40px;
+            width: 100%;
+            max-width: 1400px;
+            box-shadow: 
+                0 0 60px rgba(0, 255, 255, 0.4),
+                0 0 120px rgba(255, 0, 255, 0.3),
+                inset 0 0 60px rgba(0, 255, 255, 0.2);
+            clip-path: polygon(
+                0 30px, 30px 0, 
+                calc(100% - 30px) 0, 100% 30px,
+                100% calc(100% - 30px), calc(100% - 30px) 100%,
+                30px 100%, 0 calc(100% - 30px)
+            );
+            animation: containerPulse 4s ease-in-out infinite, borderGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes containerPulse {
+            0%, 100% {
+                box-shadow: 
+                    0 0 60px rgba(0, 255, 255, 0.4),
+                    0 0 120px rgba(255, 0, 255, 0.3),
+                    inset 0 0 60px rgba(0, 255, 255, 0.2);
+            }
+            50% {
+                box-shadow: 
+                    0 0 80px rgba(0, 255, 255, 0.6),
+                    0 0 150px rgba(255, 0, 255, 0.5),
+                    inset 0 0 80px rgba(0, 255, 255, 0.3);
+            }
+        }
+
+        @keyframes borderGlow {
+            0% {
+                border-color: var(--neon-blue);
+            }
+            25% {
+                border-color: var(--neon-pink);
+            }
+            50% {
+                border-color: var(--neon-green);
+            }
+            75% {
+                border-color: var(--neon-yellow);
+            }
+            100% {
+                border-color: var(--neon-blue);
+            }
+        }
+
+        /* Elérhető piák a képernyő tetején */
+        .beer-counter {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--panel-bg);
+            padding: 15px 30px;
+            border-radius: 0;
+            box-shadow: 0 0 30px rgba(255, 255, 0, 0.4);
+            border: 2px solid var(--neon-yellow);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            min-width: 200px;
+            justify-content: center;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            animation: counterFloat 3s ease-in-out infinite, counterPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes counterFloat {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            50% {
+                transform: translateX(-50%) translateY(-5px);
+            }
+        }
+
+        @keyframes counterPulse {
+            0%, 100% {
+                box-shadow: 0 0 30px rgba(255, 255, 0, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 50px rgba(255, 255, 0, 0.7), 0 0 70px rgba(255, 255, 0, 0.5);
+            }
+        }
+
+        .beer-counter-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .beer-icon {
+            font-size: 32px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .beer-count {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--neon-yellow);
+            min-width: 40px;
+            text-align: center;
+            text-shadow: 0 0 10px var(--neon-yellow);
+            animation: numberPulse 1.5s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        @keyframes numberPulse {
+            0%, 100% {
+                transform: scale(1);
+                text-shadow: 0 0 10px var(--neon-yellow);
+            }
+            50% {
+                transform: scale(1.1);
+                text-shadow: 0 0 20px var(--neon-yellow), 0 0 30px var(--neon-yellow);
+            }
+        }
+
+        .main-content {
+            display: flex;
+            gap: 30px;
+            width: 100%;
+            max-width: 1400px;
+            align-items: flex-start;
+            margin-top: 80px;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            min-width: 0;
+            background: transparent;
+            border-radius: 0;
+            padding: 0;
+            box-shadow: none;
+            border: none;
+            animation: fadeIn 1s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            width: 90px;
+            height: 90px;
+            border-radius: 4px;
+            background: linear-gradient(135deg, var(--neon-pink), var(--neon-pink));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 28px;
+            color: var(--dark-bg);
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.5);
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 2px solid var(--neon-orange);
+            animation: logoRotate 8s linear infinite, logoGlow 2s ease-in-out infinite;
+            position: relative;
+        }
+
+        .logo::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.3) 50%,
+                transparent 70%
+            );
+            animation: logoShine 3s linear infinite;
+        }
+
+        @keyframes logoRotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes logoGlow {
+            0%, 100% {
+                box-shadow: 0 0 30px rgba(255, 92, 0, 0.5), 0 0 50px rgba(255, 92, 0, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 50px rgba(255, 92, 0, 0.8), 0 0 70px rgba(255, 92, 0, 0.6);
+            }
+        }
+
+        @keyframes logoShine {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .header-text {
+            flex: 1;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin: 0;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px var(--neon-pink);
+            animation: titleGlow 3s ease-in-out infinite;
+            position: relative;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% {
+                text-shadow: 0 0 15px var(--neon-pink), 0 0 25px var(--neon-pink);
+            }
+            25% {
+                text-shadow: 0 0 20px var(--neon-blue), 0 0 30px var(--neon-blue);
+            }
+            50% {
+                text-shadow: 0 0 20px var(--neon-green), 0 0 30px var(--neon-green);
+            }
+            75% {
+                text-shadow: 0 0 20px var(--neon-yellow), 0 0 30px var(--neon-yellow);
+            }
+        }
+
+        .meta {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+
+        .question-container {
+            background: var(--panel-bg);
+            padding: 40px;
+            border-radius: 0;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+            border: 2px solid var(--neon-blue);
+            margin-bottom: 30px;
+            min-height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            position: relative;
+            animation: questionGlow 3s ease-in-out infinite;
+            overflow: hidden;
+        }
+
+        .question-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(0, 255, 255, 0.1) 50%,
+                transparent 70%
+            );
+            animation: questionScan 4s linear infinite;
+        }
+
+        @keyframes questionGlow {
+            0%, 100% {
+                box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+                border-color: var(--neon-blue);
+            }
+            50% {
+                box-shadow: 0 0 50px rgba(0, 255, 255, 0.6), 0 0 70px rgba(255, 0, 255, 0.4);
+                border-color: var(--neon-pink);
+            }
+        }
+
+        @keyframes questionScan {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .question {
+            font-size: 32px;
+            color: #fff;
+            font-weight: 600;
+            line-height: 1.4;
+            font-family: 'Exo 2', sans-serif;
+            position: relative;
+            animation: questionText 2s ease-in-out infinite;
+        }
+
+        /* Typing effect styles */
+        .question .typed {
+            color: #fff;
+            white-space: pre-wrap;
+            word-break: break-word;
+            display: inline;
+            font-family: 'Exo 2', sans-serif;
+            text-shadow: 0 0 8px rgba(0,255,255,0.06);
+        }
+
+        .question .caret {
+            display: inline-block;
+            margin-left: 6px;
+            color: var(--neon-blue);
+            font-weight: 800;
+            animation: caretBlink 0.7s steps(1) infinite;
+            text-shadow: 0 0 12px var(--neon-blue);
+        }
+
+       
+
+        @keyframes questionText {
+            0%, 100% {
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            }
+            50% {
+                text-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 0 0 30px rgba(0, 255, 255, 0.5);
+            }
+        }
+
+        .answers {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .ans-btn {
+            background: var(--panel-bg);
+            border: 2px solid var(--neon-blue);
+            padding: 25px;
+            border-radius: 0;
+            cursor: pointer;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: 100px;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            animation: buttonIdle 4s ease-in-out infinite;
+        }
+
+        .ans-btn:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .ans-btn:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+
+        .ans-btn:nth-child(3) {
+            animation-delay: 1s;
+        }
+
+        .ans-btn:nth-child(4) {
+            animation-delay: 1.5s;
+        }
+
+        @keyframes buttonIdle {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+            }
+        }
+
+        .ans-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .ans-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.3), transparent);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+            border-radius: 50%;
+        }
+
+        .ans-btn:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 0 40px var(--neon-blue), 0 0 60px var(--neon-blue);
+            border-color: var(--neon-blue);
+            animation: buttonHover 0.5s ease-in-out infinite;
+        }
+
+        @keyframes buttonHover {
+            0%, 100% {
+                box-shadow: 0 0 40px var(--neon-blue), 0 0 60px var(--neon-blue);
+            }
+            50% {
+                box-shadow: 0 0 60px var(--neon-blue), 0 0 80px var(--neon-blue), 0 0 100px var(--neon-blue);
+            }
+        }
+
+        .ans-btn:hover::before {
+            left: 100%;
+        }
+
+        .ans-btn:hover::after {
+            width: 200px;
+            height: 200px;
+        }
+
+        .ans-btn:active {
+            transform: translateY(1px);
+        }
+
+        .ans-btn.disabled {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .ans-btn.hidden {
+            display: none;
+        }
+
+        .ans-btn.correct {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 30px var(--neon-green);
+            background: rgba(0, 255, 0, 0.1);
+        }
+
+        .ans-btn.wrong {
+            border-color: var(--bad);
+            box-shadow: 0 0 30px var(--bad);
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .ans-btn .text {
+            color: #ffffff;
+            flex: 1;
+            font-size: 20px;
+            font-family: 'Exo 2', sans-serif;
+        }
+
+        .letter {
+            width: 50px;
+            height: 50px;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid var(--neon-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--neon-blue);
+            font-size: 20px;
+            flex-shrink: 0;
+            position: relative;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 10px var(--neon-blue);
+            animation: letterPulse 2s ease-in-out infinite;
+            transition: all 0.3s ease;
+        }
+
+        @keyframes letterPulse {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 0 0 30px rgba(0, 255, 255, 0.5);
+            }
+        }
+
+        .ans-btn:hover .letter {
+            animation: letterRotate 0.5s ease-in-out, letterPulse 1s ease-in-out infinite;
+            transform: rotate(5deg) scale(1.1);
+        }
+
+        @keyframes letterRotate {
+            0% {
+                transform: rotate(0deg) scale(1);
+            }
+            50% {
+                transform: rotate(10deg) scale(1.15);
+            }
+            100% {
+                transform: rotate(5deg) scale(1.1);
+            }
+        }
+
+        .beer-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--neon-yellow);
+            color: var(--dark-bg);
+            border-radius: 4px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 800;
+            box-shadow: 0 0 15px var(--neon-yellow);
+            animation: popIn 0.3s ease-out;
+            border: 1px solid var(--neon-yellow);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .cups {
+            position: absolute;
+            bottom: 15px;
+            right: 20px;
+            display: flex;
+            gap: 5px;
+            font-size: 20px;
+        }
+
+        .beer {
+            font-size: 24px;
+            opacity: 0;
+            transform: translateY(8px) scale(0.6);
+            animation: popIn 0.3s forwards ease-out;
+        }
+
+        @keyframes popIn {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .beer.remove {
+            animation: popOut 0.25s forwards ease-in;
+        }
+
+        @keyframes popOut {
+            to {
+                opacity: 0;
+                transform: translateY(10px) scale(0.5);
+            }
+        }
+
+        .feedback {
+            margin-top: 25px;
+            min-height: 35px;
+            font-size: 18px;
+            color: var(--neon-yellow);
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 255, 0, 0.1);
+            border-radius: 0;
+            border: 1px solid var(--neon-yellow);
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            font-family: 'Exo 2', sans-serif;
+            animation: feedbackPulse 2s ease-in-out infinite;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feedback::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 0, 0.3), transparent);
+            animation: feedbackScan 3s linear infinite;
+        }
+
+        @keyframes feedbackPulse {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(255, 255, 0, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(255, 255, 0, 0.6);
+            }
+        }
+
+        @keyframes feedbackScan {
+            0% {
+                left: -100%;
+            }
+            100% {
+                left: 100%;
+            }
+        }
+
+        .feedback.correct {
+            background: rgba(0, 255, 0, 0.1);
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            animation: feedbackCorrect 1s ease-in-out infinite;
+        }
+
+        @keyframes feedbackCorrect {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(0, 255, 0, 0.6), 0 0 60px rgba(0, 255, 0, 0.4);
+                transform: scale(1.02);
+            }
+        }
+
+        .feedback.wrong {
+            background: rgba(255, 107, 107, 0.1);
+            border-color: var(--bad);
+            color: var(--bad);
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
+            animation: feedbackWrong 0.5s ease-in-out infinite;
+        }
+
+        @keyframes feedbackWrong {
+            0%, 100% {
+                transform: translateX(0);
+                box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
+            }
+            25% {
+                transform: translateX(-5px);
+            }
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            justify-content: flex-end;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        button.control {
+            background: transparent;
+            border: 2px solid var(--neon-blue);
+            padding: 15px 25px;
+            border-radius: 0;
+            color: var(--neon-blue);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 16px;
+            font-family: 'Exo 2', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+
+        button.control::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        button.control:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        button.control:hover {
+            box-shadow: 0 0 30px var(--neon-blue), 0 0 50px var(--neon-blue);
+            transform: translateY(-3px) scale(1.05);
+            animation: controlHover 0.6s ease-in-out infinite;
+        }
+
+        @keyframes controlHover {
+            0%, 100% {
+                box-shadow: 0 0 30px var(--neon-blue), 0 0 50px var(--neon-blue);
+            }
+            50% {
+                box-shadow: 0 0 40px var(--neon-blue), 0 0 60px var(--neon-blue), 0 0 80px var(--neon-blue);
+            }
+        }
+
+        button.control:active {
+            transform: translateY(1px) scale(0.98);
+            animation: controlClick 0.2s ease;
+        }
+
+        @keyframes controlClick {
+            0% {
+                transform: translateY(1px) scale(0.98);
+            }
+            50% {
+                transform: translateY(1px) scale(0.95);
+            }
+            100% {
+                transform: translateY(1px) scale(0.98);
+            }
+        }
+
+        button.control.primary {
+            background: transparent;
+            border-color: var(--neon-yellow);
+            color: var(--neon-yellow);
+        }
+
+        button.control.primary:hover {
+            box-shadow: 0 0 20px var(--neon-yellow);
+        }
+
+        button.control.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* Lépcsős megjelenítés a képernyő szélén */
+        .progress-ladder {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 25px 15px;
+            background: var(--panel-bg);
+            border-radius: 0;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+            border: 2px solid var(--neon-blue);
+            z-index: 10;
+            max-height: 80vh;
+            overflow-y: auto;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+
+        .ladder-step {
+            width: 100%;
+            padding: 15px;
+            margin: 6px 0;
+            border-radius: 0;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            color: #fff;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-family: 'Exo 2', sans-serif;
+            animation: stepIdle 3s ease-in-out infinite;
+        }
+
+        @keyframes stepIdle {
+            0%, 100% {
+                opacity: 0.8;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        .ladder-step.current {
+            background: rgba(255, 255, 0, 0.2);
+            border: 2px solid var(--neon-yellow);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 255, 0, 0.4);
+            animation: stepCurrent 1.5s ease-in-out infinite;
+        }
+
+        @keyframes stepCurrent {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(255, 255, 0, 0.4);
+                transform: scale(1.05);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(255, 255, 0, 0.7), 0 0 60px rgba(255, 255, 0, 0.5);
+                transform: scale(1.08);
+            }
+        }
+
+        .ladder-step.correct {
+            background: rgba(0, 255, 0, 0.2);
+            border: 2px solid var(--neon-green);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
+        }
+
+        .ladder-step-number {
+            font-size: 15px;
+            opacity: 0.7;
+        }
+
+        .ladder-step-value {
+            font-size: 16px;
+        }
+
+        .ladder-step-indicator {
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid var(--neon-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .ladder-step.correct .ladder-step-indicator {
+            background: var(--neon-green);
+            border-color: var(--neon-green);
+        }
+
+        .ladder-step.current .ladder-step-indicator {
+            background: var(--neon-yellow);
+            border-color: var(--neon-yellow);
+        }
+
+        /* Overlay-ek */
+        #start-overlay, .game-over-overlay, .win-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            z-index: 9999;
+            font-family: 'Exo 2', sans-serif;
+        }
+
+        #start-overlay {
+            background: rgba(10, 10, 26, 0.95);
+        }
+
+        #start-overlay h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px var(--neon-pink);
+        }
+
+        #start-overlay button {
+            padding: 12px 24px;
+            font-size: 18px;
+            border: 2px solid var(--neon-yellow);
+            border-radius: 0;
+            background: transparent;
+            color: var(--neon-yellow);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Exo 2', sans-serif;
+            text-transform: uppercase;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+
+        #start-overlay button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--neon-yellow);
+        }
+
+        .game-over-overlay {
+            background: rgba(10, 10, 26, 0.95);
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .win-overlay {
+            background: rgba(10, 10, 26, 0.95);
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game-over-box, .win-box {
+            background: var(--panel-bg);
+            border: 2px solid var(--neon-yellow);
+            border-radius: 0;
+            padding: 40px;
+            text-align: center;
+            color: #fff;
+            transform: scale(0.8);
+            transition: transform 0.5s ease;
+            max-width: 500px;
+            width: 90%;
+            clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
+            box-shadow: 0 0 40px rgba(255, 255, 0, 0.4);
+        }
+
+        .win-box {
+            border: 2px solid var(--neon-green);
+            background: var(--panel-bg);
+            box-shadow: 0 0 40px rgba(0, 255, 0, 0.4);
+        }
+
+        .game-over-box h2, .win-box h2 {
+            margin-bottom: 16px;
+            font-size: 28px;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .win-box h2 {
+            color: var(--neon-green);
+            font-size: 36px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px var(--neon-green);
+        }
+
+        .game-over-box p, .win-box p {
+            margin-bottom: 20px;
+            font-size: 18px;
+            line-height: 1.5;
+            font-family: 'Exo 2', sans-serif;
+        }
+
+        .win-box p {
+            font-size: 20px;
+            color: #fff;
+        }
+
+        .game-over-box button, .win-box button {
+            padding: 12px 24px;
+            border: 2px solid var(--neon-yellow);
+            border-radius: 0;
+            background: transparent;
+            color: var(--neon-yellow);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            margin: 5px;
+            font-family: 'Exo 2', sans-serif;
+            text-transform: uppercase;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+
+        .win-box button {
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        .game-over-box button:hover, .win-box button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px currentColor;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .confetti {
+            position: fixed;
+            width: 15px;
+            height: 15px;
+            background: var(--neon-yellow);
+            opacity: 0;
+            z-index: 9998;
+        }
+
+        /* Piros flash játék végekor */
+        body.game-over-flash::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 0, 0, 0.5);
+            z-index: 9000;
+            pointer-events: none;
+            animation: redFlash 2s ease forwards;
+        }
+
+        @keyframes redFlash {
+            0% {
+                background: rgba(255, 0, 0, 0.8);
+            }
+            50% {
+                background: rgba(255, 0, 0, 0.5);
+            }
+            100% {
+                background: rgba(255, 0, 0, 0);
+            }
+        }
+
+        /* Zöld flash helyes válasz esetén */
+        body.correct-answer-flash::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(81, 207, 102, 0.5);
+            z-index: 9000;
+            pointer-events: none;
+            animation: greenFlash 1.5s ease forwards;
+        }
+
+        @keyframes greenFlash {
+            0% {
+                background: rgba(81, 207, 102, 0.8);
+            }
+            50% {
+                background: rgba(81, 207, 102, 0.5);
+            }
+            100% {
+                background: rgba(81, 207, 102, 0);
+            }
+        }
+
+        /* Refill gomb stílus */
+        .refill-btn {
+            background: transparent;
+            color: var(--neon-blue);
+            border: 2px solid var(--neon-blue);
+            padding: 12px 24px;
+            border-radius: 0;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            margin: 5px;
+            font-family: 'Exo 2', sans-serif;
+            text-transform: uppercase;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+
+        .refill-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--neon-blue);
+        }
+
+        /* Reszponzív design */
+        @media (max-width: 1400px) {
+            .main-content {
+                max-width: 1200px;
+            }
+            
+            .container {
+                padding: 35px;
+            }
+            
+            .question {
+                font-size: 28px;
+            }
+            
+            .ans-btn {
+                padding: 22px;
+                min-height: 90px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .progress-ladder {
+                position: relative;
+                right: auto;
+                top: auto;
+                transform: none;
+                width: 100%;
+                max-width: 900px;
+                margin-top: 30px;
+                flex-direction: row;
+                overflow-x: auto;
+                padding: 20px 15px;
+                max-height: none;
+            }
+            
+            .ladder-step {
+                min-width: 140px;
+                margin: 0 8px;
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .help-icons {
+                top: 10px;
+                left: 10px;
+                gap: 10px;
+            }
+            
+            .help-icon {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .help-icon .icon {
+                font-size: 20px;
+            }
+            
+            .beer-counter {
+                top: 10px;
+                padding: 12px 20px;
+                min-width: 180px;
+            }
+            
+            .beer-counter-content {
+                font-size: 20px;
+            }
+            
+            .beer-icon {
+                font-size: 28px;
+            }
+            
+            .beer-count {
+                font-size: 24px;
+            }
+            
+            .main-content {
+                margin-top: 100px;
+            }
+            
+            .answers {
+                grid-template-columns: 1fr;
+            }
+            
+            .question {
+                font-size: 24px;
+            }
+            
+            .question-container {
+                padding: 30px;
+                min-height: 140px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .control-buttons {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .progress-ladder {
+                flex-direction: column;
+                overflow-x: visible;
+                overflow-y: auto;
+                max-height: 200px;
+            }
+            
+            .ladder-step {
+                min-width: auto;
+                margin: 4px 0;
+                flex-direction: row;
+            }
+            
+            header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            
+            .logo {
+                width: 80px;
+                height: 80px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .win-box, .game-over-box {
+                padding: 30px 20px;
+                margin: 20px;
+            }
+            
+            .win-box h2 {
+                font-size: 28px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .button-group button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Cyberpunk háttér elemek -->
+    <div class="cyber-grid"></div>
+    <div class="scanlines"></div>
+    <div class="glitch-overlay"></div>
+
+    <!-- Segítség ikonok a bal felső sarokban -->
+    <div class="help-icons">
+        <div class="help-icon" id="help-1">
+            <div class="icon">½</div>
+            <div class="close-btn"></div>
+        </div>
+        <div class="help-icon" id="help-2">
+            <div class="icon">📞</div>
+            <div class="close-btn"></div>
+        </div>
+        <div class="help-icon" id="help-3">
+            <div class="icon">👥</div>
+            <div class="close-btn"></div>
+        </div>
+    </div>
+
+    <!-- Elérhető piák a képernyő tetején -->
+    <div class="beer-counter">
+        <div class="beer-counter-content">
+            <span class="beer-icon">🍺</span>
+            <span>Elérhető piák:</span>
+            <span class="beer-count" id="availableBeers">10</span>
+        </div>
+    </div>
+
+    <!-- Fő tartalom -->
+    <div class="cyber-main">
+        <div class="main-content">
+            <div class="container">
+            <header>
+                <div class="logo">
+                    <!-- Ide jön a kép - cseréld le a kívánt képre -->
+                    <img src="Screenshot_20240310_124300_One_UI_Home.jpg" alt="Legyen Ön is Milliomos logó">
+                </div>
+                <div class="header-text">
+                    <h1>Meg kell inni!</h1>
+                </div>
+            </header>
+            
+            <div class="question-container">
+                <div class="question" id="question">A naprendszer tömegének hány százalékát teszi ki a nap?</div>
+            </div>
+            
+            <div class="answers" id="answers">
+                <button class="ans-btn" data-index="0">
+                    <span class="letter">A</span>
+                    <span class="text">64,3%</span>
+                    <div class="cups" id="cups-0"></div>
+                </button>
+                <button class="ans-btn" data-index="1">
+                    <span class="letter">B</span>
+                    <span class="text">92,3%</span>
+                    <div class="cups" id="cups-1"></div>
+                </button>
+                <button class="ans-btn" data-index="2">
+                    <span class="letter">C</span>
+                    <span class="text">99,8%</span>
+                    <div class="cups" id="cups-2"></div>
+                </button>
+                <button class="ans-btn" data-index="3">
+                    <span class="letter">D</span>
+                    <span class="text">78,5%</span>
+                    <div class="cups" id="cups-3"></div>
+                </button>
+            </div>
+            
+            <div class="feedback" id="feedback"></div>
+            
+            <div class="controls">
+                <div class="control-buttons">
+                    <button class="control" id="undoBtn">Visszavonás</button>
+                    <button class="control" id="checkBtn">Megnézem</button>
+                    <button class="control primary disabled" id="nextBtn">Következő kérdés</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    
+    <!-- Lépcsős megjelenítés a képernyő jobb szélén -->
+    <div class="progress-ladder" id="progressLadder">
+        <!-- A lépcsők JavaScript-el generálódnak -->
+    </div>
+
+    <div id="start-overlay" style="display:none">
+        <h2>🎯 Készen állsz?</h2>
+        <button id="startBtn">Indítás</button>
+    </div>
+
+    <div class="game-over-overlay" id="gameOverOverlay">
+        <div class="game-over-box">
+            <h2>🎮 Játék vége!</h2>
+            <p id="finalScoreText"></p>
+            <div class="button-group">
+                <button id="restartBtn">Új játék</button>
+                <button id="backToHomeBtn">Vissza a főoldalra</button>
+                <button class="refill-btn" id="refillBtn" style="display:none">REFILL (+10 pia)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nyertél felugró ablak -->
+    <div class="win-overlay" id="winOverlay">
+        <div class="win-box">
+            <h2>🎉 NYERTÉL! 🎉</h2>
+            <p>Nyertél cigány!</p>
+            <p>A nyereményed egy találkozó az örjöngő ötössel 🏆</p>
+            <div class="button-group">
+                <button id="winRestartBtn">Új játék</button>
+                <button id="winBackToHomeBtn">Vissza a főoldalra</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Segítség ikonok kezelése
+        const helpIcons = document.querySelectorAll('.help-icon');
+        let helpUsed = {
+            halve: false,
+            phone: false,
+            audience: false
+        };
+
+        helpIcons.forEach(icon => {
+            const closeBtn = icon.querySelector('.close-btn');
+            closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                icon.style.display = 'none';
+            });
+            
+            icon.addEventListener('click', () => {
+                if (icon.classList.contains('disabled')) return;
+                
+                const iconId = icon.id;
+                if (iconId === 'help-1') {
+                    if (!helpUsed.halve) {
+                        useHalveHelp();
+                        helpUsed.halve = true;
+                        icon.classList.add('disabled');
+                    }
+                } else if (iconId === 'help-2') {
+                    if (!helpUsed.phone) {
+                        helpUsed.phone = true;
+                        icon.classList.add('disabled');
+                    }
+                } else if (iconId === 'help-3') {
+                    if (!helpUsed.audience) {
+                        helpUsed.audience = true;
+                        icon.classList.add('disabled');
+                    }
+                }
+            });
+        });
+
+        // Felező segítség funkció
+        function useHalveHelp() {
+            const currentQuestionData = questions[currentQuestion];
+            const correctIndex = currentQuestionData.correctIndex;
+            
+            const wrongIndices = [];
+            for (let i = 0; i < 4; i++) {
+                if (i !== correctIndex) {
+                    wrongIndices.push(i);
+                }
+            }
+            
+            const randomWrongIndex1 = wrongIndices[Math.floor(Math.random() * wrongIndices.length)];
+            wrongIndices.splice(wrongIndices.indexOf(randomWrongIndex1), 1);
+            const randomWrongIndex2 = wrongIndices[Math.floor(Math.random() * wrongIndices.length)];
+            
+            const answerButtons = document.querySelectorAll('.ans-btn');
+            answerButtons[randomWrongIndex1].classList.add('hidden');
+            answerButtons[randomWrongIndex2].classList.add('hidden');
+            
+            const fEl = document.getElementById('feedback');
+            fEl.textContent = `✅ Felező segítség: Eltávolítottunk két rossz választ!`;
+        }
+
+        // PROGRESS MENTÉS FUNKCIÓ - JAVÍTOTT (10 kérdés)
+        function savePlayerProgress(playerName) {
+            try {
+                const currentLeaderboard = JSON.parse(localStorage.getItem('gameLeaderboard') || '{}');
+                
+                // Csak akkor mentjük a progress-t, ha a játékos sikeresen teljesítette a kérdést
+                // Vagyis ha pozitív piája maradt a kérdés után
+                if (availablePoints > 0) {
+                    let actualProgress = currentQuestion + 1;
+                    
+                    // Ha nyertünk (minden kérdés helyes), akkor 10. kérdés
+                    if (checkIfAllCorrect()) {
+                        actualProgress = 10;
+                    }
+                    // Ha az utolsó kérdésnél vagyunk és még nem nyertünk, de helyes a válasz
+                    else if (currentQuestion === 9 && availablePoints > 0) {
+                        actualProgress = 10;
+                    }
+                    // Egyébként csak a jelenlegi kérdés száma
+                    else {
+                        actualProgress = Math.min(currentQuestion + 1, 10);
+                    }
+                    
+                    // Csak akkor mentjük, ha ez magasabb progress, mint az előző
+                    const currentProgress = currentLeaderboard[playerName]?.progress || 0;
+                    if (actualProgress > currentProgress) {
+                        // Külön kezeljük az István nevet, hogy ékezetes legyen
+                        let displayName = playerName.charAt(0).toUpperCase() + playerName.slice(1);
+                        if (playerName === 'balazs') {
+                            displayName = 'Balázs';
+                        }
+                        
+                        currentLeaderboard[playerName] = { 
+                            name: displayName, 
+                            progress: actualProgress 
+                        };
+                        
+                        localStorage.setItem('gameLeaderboard', JSON.stringify(currentLeaderboard));
+                        console.log(`${playerName} progress mentve: ${actualProgress}. kérdés`);
+                    }
+                } else {
+                    // Ha nincs piája, akkor nem mentjük a progress-t
+                    console.log(`${playerName} nem teljesítette a ${currentQuestion + 1}. kérdést, progress nem mentve`);
+                }
+            } catch (e) {
+                console.error('Hiba a progress mentése során:', e);
+            }
+        }
+
+        // Játékállapot
+        const START_POINTS = 10;
+        const questions = [
+            {
+                q: '',
+                options: ['', '', '', ''],
+                correctIndex: 2
+            },
+            {
+                q: '',
+                options: ['', '', '', ''],
+                correctIndex: 1
+            },
+            {
+                q: '',
+                options: ['', '', '', ''],
+                correctIndex: 0
+            },
+            {
+                q: '',
+                options: ['', '', '', ''],
+                correctIndex: 3
+            },
+            {
+                q: '',
+                options: ['', '', '', ''],
+                correctIndex: 2
+            },
+            {
+                q: '',
+                options: ['', '', '', ''],
+                correctIndex: 0
+            },
+            {
+                q: '',
+                options: ['', '', '', ''],
+                correctIndex: 1
+            },
+            {
+                q: '',
+                options: ['', '', '', ''],
+                correctIndex: 3
+            },
+            {
+                q: '',
+                options: ['', '', '', ''],
+                correctIndex: 2
+            },
+            {
+                q: '',
+                options: ['', '', '', ''],
+                correctIndex: 0
+            }
+            
+        ];
+
+        let currentQuestion = 0;
+        let availablePoints = START_POINTS;
+        let totalPointsPlaced = 0;
+        let currentBets = [0, 0, 0, 0];
+        let betHistory = [];
+        let gameOver = false;
+        let finalScore = 0;
+        let answerChecked = false;
+        let correctAnswers = [];
+
+        // DOM elemek
+        const qEl = document.getElementById('question');
+        const aEl = document.getElementById('answers');
+        const fEl = document.getElementById('feedback');
+        const checkBtn = document.getElementById('checkBtn');
+        const undoBtn = document.getElementById('undoBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const startOverlay = document.getElementById('start-overlay');
+        const startBtn = document.getElementById('startBtn');
+        const gameOverOverlay = document.getElementById('gameOverOverlay');
+        const finalScoreText = document.getElementById('finalScoreText');
+        const restartBtn = document.getElementById('restartBtn');
+        const backToHomeBtn = document.getElementById('backToHomeBtn');
+        const progressLadder = document.getElementById('progressLadder');
+        const availableBeersEl = document.getElementById('availableBeers');
+        const winOverlay = document.getElementById('winOverlay');
+        const winRestartBtn = document.getElementById('winRestartBtn');
+        const winBackToHomeBtn = document.getElementById('winBackToHomeBtn');
+        const refillBtn = document.getElementById('refillBtn');
+
+        // Refill funkció
+        function useRefill() {
+            availablePoints += 10;
+            updateAvailableBeers();
+            refillBtn.style.display = 'none';
+            document.body.classList.remove('game-over-flash');
+            gameOver = false;
+            gameOverOverlay.style.display = 'none';
+            
+            currentQuestion++;
+            if (currentQuestion >= questions.length) {
+                if (checkIfAllCorrect()) {
+                    showWinScreen();
+                } else {
+                    endGame();
+                }
+                return;
+            }
+            renderQuestion();
+        }
+
+        // Visszairányítás a főoldalra
+        function goToHomePage() {
+            window.location.href = 'index.html';
+        }
+
+        // Konfetti effekt
+        function createConfetti() {
+            const colors = ['#ffff00', '#00ff00', '#ff00ff', '#00ffff', '#9d00ff'];
+            const confettiCount = 150;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = '-20px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                document.body.appendChild(confetti);
+                
+                const animation = confetti.animate([
+                    { transform: `translateY(0) rotate(0deg)`, opacity: 1 },
+                    { transform: `translateY(${window.innerHeight + 100}px) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+                ], {
+                    duration: 2000 + Math.random() * 3000,
+                    easing: 'cubic-bezier(0.1, 0.8, 0.2, 1)'
+                });
+                
+                animation.onfinish = () => confetti.remove();
+            }
+        }
+
+        // Piák számláló frissítése a válaszok betűi mellett
+        function updateBeerBadges() {
+            const ansButtons = document.querySelectorAll('.ans-btn');
+            ansButtons.forEach((btn, index) => {
+                let badge = btn.querySelector('.beer-badge');
+                if (!badge && currentBets[index] > 0) {
+                    badge = document.createElement('span');
+                    badge.className = 'beer-badge';
+                    btn.querySelector('.letter').appendChild(badge);
+                }
+                
+                if (badge) {
+                    if (currentBets[index] > 0) {
+                        badge.textContent = currentBets[index];
+                    } else {
+                        badge.remove();
+                    }
+                }
+            });
+        }
+
+        // Elérhető piák frissítése
+        function updateAvailableBeers() {
+            availableBeersEl.textContent = availablePoints;
+            // Animate beer counter when value changes
+            availableBeersEl.style.animation = 'none';
+            setTimeout(() => {
+                availableBeersEl.style.animation = 'numberPulse 0.5s ease-in-out';
+            }, 10);
+        }
+
+        // Lépcsős megjelenítés inicializálása
+        function initProgressLadder() {
+            progressLadder.innerHTML = '';
+            for (let i = 0; i < questions.length; i++) {
+                const step = document.createElement('div');
+                step.className = 'ladder-step';
+                step.innerHTML = `
+                    <span class="ladder-step-number">${i + 1}. kérdés</span>
+                    <span class="ladder-step-indicator"></span>
+                `;
+                progressLadder.appendChild(step);
+            }
+            updateProgressLadder();
+        }
+
+        // Lépcsős megjelenítés frissítése
+        function updateProgressLadder() {
+            const steps = progressLadder.querySelectorAll('.ladder-step');
+            steps.forEach((step, index) => {
+                step.classList.remove('current', 'correct');
+                
+                if (index === currentQuestion) {
+                    step.classList.add('current');
+                }
+                
+                if (correctAnswers.includes(index)) {
+                    step.classList.add('correct');
+                }
+            });
+        }
+
+        // Zöld flash effekt
+        function triggerGreenFlash() {
+            document.body.classList.add('correct-answer-flash');
+            setTimeout(() => {
+                document.body.classList.remove('correct-answer-flash');
+            }, 1500);
+        }
+
+        // Nyertél felugró ablak
+        function showWinScreen() {
+            winOverlay.style.display = 'flex';
+            setTimeout(() => {
+                winOverlay.style.opacity = '1';
+                createConfetti();
+            }, 100);
+        }
+
+        // Ellenőrzi, hogy minden kérdésre helyesen válaszolt-e
+        function checkIfAllCorrect() {
+            return correctAnswers.length === questions.length && availablePoints > 0;
+        }
+
+        // Kérdés megjelenítése
+        // Typing helper: types text into the question element with a caret
+        let typingTimer = null;
+        function typeQuestion(text, speed = 18) {
+            if (typingTimer) {
+                clearTimeout(typingTimer);
+                typingTimer = null;
+            }
+            // prepare elements
+            qEl.innerHTML = '<span class="typed"></span><span class="caret">|</span>';
+            const typedEl = qEl.querySelector('.typed');
+            const caretEl = qEl.querySelector('.caret');
+            let i = 0;
+
+            function step() {
+                if (i <= text.length) {
+                    typedEl.textContent = text.slice(0, i);
+                    i++;
+                    // small random jitter to feel more 'fast-typed'
+                    typingTimer = setTimeout(step, speed + Math.random() * 6);
+                } else {
+                    // finished typing -> fade out caret
+                    caretEl.style.transition = 'opacity 200ms';
+                    caretEl.style.opacity = '0';
+                    typingTimer = null;
+                }
+            }
+
+            step();
+        }
+
+        function renderQuestion() {
+            if (gameOver) return;
+            const item = questions[currentQuestion];
+            // type the question instead of setting it instantly
+            typeQuestion(item.q);
+            aEl.innerHTML = '';
+            fEl.textContent = '';
+            currentBets = [0, 0, 0, 0];
+            betHistory = [];
+            totalPointsPlaced = 0;
+            answerChecked = false;
+            
+            nextBtn.classList.add('disabled');
+
+            item.options.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'ans-btn';
+                btn.setAttribute('data-index', i);
+                btn.innerHTML = `
+                    <span class="letter">${String.fromCharCode(65 + i)}</span>
+                    <span class="text">${opt}</span>
+                    <div class="cups" id="cups-${i}"></div>
+                `;
+                btn.addEventListener('click', () => addPoint(i));
+                aEl.appendChild(btn);
+            });
+
+            updateAvailableBeers();
+            updateProgressLadder();
+        }
+
+        // Pont hozzáadása egy válaszhoz
+        function addPoint(i) {
+            if (totalPointsPlaced >= availablePoints) {
+                fEl.textContent = `❌ Már elhelyezted az összes (${availablePoints}) piát!`;
+                return;
+            }
+            currentBets[i]++;
+            totalPointsPlaced++;
+            betHistory.push(i);
+
+            const cupsEl = document.getElementById(`cups-${i}`);
+            const beer = document.createElement('span');
+            beer.className = 'beer';
+            beer.textContent = '🍺';
+            cupsEl.appendChild(beer);
+
+            updateAvailableBeers();
+            updateBeerBadges();
+        }
+
+        // Utolsó pont visszavonása
+        function undoLastPoint() {
+            if (betHistory.length === 0) {
+                fEl.textContent = '⚠️ Nincs több visszavonható pia.';
+                return;
+            }
+            const last = betHistory.pop();
+            currentBets[last]--;
+            totalPointsPlaced--;
+            const cupsEl = document.getElementById(`cups-${last}`);
+            const beers = cupsEl.querySelectorAll('.beer');
+            if (beers.length > 0) {
+                const lastBeer = beers[beers.length - 1];
+                lastBeer.classList.add('remove');
+                setTimeout(() => lastBeer.remove(), 200);
+            }
+            updateAvailableBeers();
+            updateBeerBadges();
+        }
+
+        // Válasz ellenőrzése - JAVÍTOTT
+        function checkAnswer() {
+            if (gameOver) return;
+            const item = questions[currentQuestion];
+            document.querySelectorAll('.ans-btn').forEach(b => b.classList.add('disabled'));
+            const correct = item.correctIndex;
+            document.querySelectorAll('.ans-btn')[correct].classList.add('correct');
+
+            let gainedPoints = currentBets[correct];
+            if (gainedPoints > 0) {
+                finalScore++;
+                correctAnswers.push(currentQuestion);
+                triggerGreenFlash();
+            }
+            availablePoints = gainedPoints;
+
+            currentBets.forEach((bet, i) => {
+                if (bet > 0 && i !== correct) document.querySelectorAll('.ans-btn')[i].classList.add('wrong');
+            });
+
+            nextBtn.classList.remove('disabled');
+            answerChecked = true;
+
+            if (checkIfAllCorrect()) {
+                setTimeout(showWinScreen, 500);
+            } else if (availablePoints <= 0) {
+                setTimeout(endGame, 500);
+            } else {
+                fEl.textContent = `✅ Továbbjutás! Következő kérdésre marad: ${availablePoints} pia`;
+            }
+            
+            // PROGRESS MENTÉS - ITT HIVATKOZZUK MEG
+            savePlayerProgress('balazs');
+            
+            updateAvailableBeers();
+            updateProgressLadder();
+        }
+
+        // Következő kérdés
+        function nextQuestion() {
+            if (gameOver || availablePoints <= 0 || !answerChecked) return;
+            currentQuestion++;
+            if (currentQuestion >= questions.length) {
+                if (checkIfAllCorrect()) {
+                    showWinScreen();
+                } else {
+                    endGame();
+                }
+                return;
+            }
+            renderQuestion();
+        }
+
+        // Játék újraindítása
+        function resetGame() {
+            document.body.classList.remove('game-over-flash');
+            currentQuestion = 0;
+            finalScore = 0;
+            availablePoints = START_POINTS;
+            gameOver = false;
+            correctAnswers = [];
+            gameOverOverlay.style.display = 'none';
+            winOverlay.style.display = 'none';
+            
+            helpUsed = {
+                halve: false,
+                phone: false,
+                audience: false
+            };
+            
+            helpIcons.forEach(icon => {
+                icon.classList.remove('disabled');
+                icon.style.display = 'flex';
+            });
+            
+            refillBtn.style.display = 'none';
+            
+            updateAvailableBeers();
+            initProgressLadder();
+            renderQuestion();
+        }
+
+        // Játék vége
+        function endGame() {
+            gameOver = true;
+            document.body.classList.add('game-over-flash');
+            gameOverOverlay.style.display = 'flex';
+            gameOverOverlay.style.opacity = 1;
+            finalScoreText.textContent = `${questions.length} kérdésből ${finalScore} kérdésen jutottál túl pozitív piával.`;
+            
+            if (currentQuestion < questions.length - 1) {
+                refillBtn.style.display = 'inline-block';
+            } else {
+                refillBtn.style.display = 'none';
+            }
+        }
+
+        // Eseménykezelők
+        nextBtn.onclick = nextQuestion;
+        checkBtn.onclick = checkAnswer;
+        undoBtn.onclick = undoLastPoint;
+        restartBtn.onclick = resetGame;
+        winRestartBtn.onclick = resetGame;
+        backToHomeBtn.onclick = goToHomePage;
+        winBackToHomeBtn.onclick = goToHomePage;
+        refillBtn.onclick = useRefill;
+        startBtn.onclick = () => {
+            startOverlay.style.display = 'none';
+            updateAvailableBeers();
+            initProgressLadder();
+            renderQuestion();
+        };
+
+        // Particle effect function
+        function createParticles(x, y, color) {
+            const particleCount = 15;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.style.position = 'fixed';
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.width = '4px';
+                particle.style.height = '4px';
+                particle.style.background = color;
+                particle.style.borderRadius = '50%';
+                particle.style.pointerEvents = 'none';
+                particle.style.zIndex = '9999';
+                particle.style.boxShadow = `0 0 10px ${color}`;
+                document.body.appendChild(particle);
+                
+                const angle = (Math.PI * 2 * i) / particleCount;
+                const velocity = 2 + Math.random() * 3;
+                const vx = Math.cos(angle) * velocity;
+                const vy = Math.sin(angle) * velocity;
+                
+                particle.animate([
+                    {
+                        transform: 'translate(0, 0) scale(1)',
+                        opacity: 1
+                    },
+                    {
+                        transform: `translate(${vx * 50}px, ${vy * 50}px) scale(0)`,
+                        opacity: 0
+                    }
+                ], {
+                    duration: 800 + Math.random() * 400,
+                    easing: 'ease-out'
+                }).onfinish = () => particle.remove();
+            }
+        }
+
+        // Enhanced button click effects
+        document.querySelectorAll('.ans-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const rect = this.getBoundingClientRect();
+                createParticles(
+                    rect.left + rect.width / 2,
+                    rect.top + rect.height / 2,
+                    'var(--neon-blue)'
+                );
+            });
+        });
+
+        document.querySelectorAll('button.control').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const rect = this.getBoundingClientRect();
+                createParticles(
+                    rect.left + rect.width / 2,
+                    rect.top + rect.height / 2,
+                    'var(--neon-blue)'
+                );
+            });
+        });
+
+        // Add ripple effect to answer buttons
+        function addRippleEffect(element, color) {
+            element.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.style.position = 'absolute';
+                ripple.style.borderRadius = '50%';
+                ripple.style.background = color;
+                ripple.style.opacity = '0.5';
+                ripple.style.transform = 'scale(0)';
+                ripple.style.animation = 'ripple 0.6s ease-out';
+                ripple.style.pointerEvents = 'none';
+                
+                this.style.position = 'relative';
+                this.style.overflow = 'hidden';
+                this.appendChild(ripple);
+                
+                setTimeout(() => ripple.remove(), 600);
+            });
+        }
+
+        // Add ripple animation keyframe
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Enhanced hover effects for answer buttons
+        document.querySelectorAll('.ans-btn').forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                this.style.animation = 'buttonHover 0.5s ease-in-out infinite';
+            });
+            
+            btn.addEventListener('mouseleave', function() {
+                this.style.animation = 'buttonIdle 4s ease-in-out infinite';
+            });
+        });
+
+        // Kezdeti kérdés betöltése
+        updateAvailableBeers();
+        initProgressLadder();
+        renderQuestion();
+    </script>
+</body>
+</html>
