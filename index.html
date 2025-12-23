@@ -13,6 +13,7 @@
     --neon-yellow: #ffff00;
     --neon-purple: #9d00ff;
     --neon-red: #FF3131;
+    --neon-orange: #FF5C00;
     --dark-bg: #0a0a1a;
     --grid-color: rgba(0, 255, 255, 0.1);
     --panel-bg: rgba(0, 20, 40, 0.85);
@@ -153,7 +154,8 @@
   /* --- PLAYER CARDS (3D TILT) --- */
   .cyber-grid-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    /* Force five columns so all player cards stay on one line */
+    grid-template-columns: repeat(5, minmax(160px, 1fr));
     gap: 25px;
     perspective: 1000px;
   }
@@ -186,6 +188,7 @@
   .card-2 { --card-color: var(--neon-blue); }
   .card-3 { --card-color: var(--neon-red); }
   .card-4 { --card-color: var(--neon-green); }
+  .card-5 { --card-color: var(--neon-orange); }
 
   .cyber-player-card:hover {
     border-color: var(--card-color);
@@ -343,6 +346,15 @@
             <div class="player-class">A KAMAGRÁS</div>
           </div>
         </a>
+        
+        <a href="hunor.html" class="cyber-player-card card-5" id="card5">
+          <div class="player-card-content">
+            <div class="player-holo-icon"><img src="Screenshot_20240310_124300_One_UI_Home.jpg" alt=""></div>
+            <h3 class="player-name">HUNOR</h3>
+            <div class="player-class">HOKIGÉP</div>
+          </div>
+        </a>
+        
       </div>
     </section>
     
